@@ -6,6 +6,7 @@ import { CartItem } from "./Cart.schema";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import IconButton from "@mui/material/IconButton";
+import Button from "@mui/material/Button";
 
 type CartProps = {
     items?: CartItem[];
@@ -17,6 +18,15 @@ function Cart({ items = [] }: CartProps) {
     function updateQuantity(item: CartItem, quantity: number) {
         item.updateQuantity(quantity);
         setCartItems([...cartItems]);
+    }
+
+    function calculateTotalCost(items: CartItem[]) {
+        const totals = items.map((item) => item.total(false) as number);
+        const cost = totals.reduce((acc, total) => {
+            return acc + total;
+        }, 0);
+
+        return "$" + (cost / 100).toString();
     }
 
     return (
@@ -95,6 +105,18 @@ function Cart({ items = [] }: CartProps) {
                     );
                 })}
             </ul>
+            <div className={styles.totalCostContainer}>
+                <p>
+                    Total Cost: <b>{calculateTotalCost(cartItems)}</b>
+                </p>
+                <Button
+                    variant="contained"
+                    className={styles.checkoutBtn}
+                    size="large"
+                >
+                    Checkout
+                </Button>
+            </div>
         </div>
     );
 }

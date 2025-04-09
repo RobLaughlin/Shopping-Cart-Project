@@ -3,6 +3,7 @@
     background-color: white;
     color: black;
     margin: 32px;
+    cursor: default;
 }
 
 .cartItem {
@@ -81,4 +82,19 @@
 .addIconContainer:focus,
 .removeIconContainer:focus {
     outline: 0;
+}
+
+.totalCostContainer {
+    display: flex;
+    font-size: 48px;
+    width: 100%;
+}
+
+.checkoutBtn {
+    margin-left: auto !important;
+    width: 25%;
+}
+
+.checkoutBtn:focus {
+    outline: 0 !important;
 }
