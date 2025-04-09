@@ -64,8 +64,13 @@
 }
 
 .quantityBtnContainer {
-    display: flex;
+    display: grid;
+    margin-top: 8px;
+    grid-template-columns: 1fr 2px 1fr;
     vertical-align: middle;
+    border: 1px solid lightgray;
+    border-radius: 4px;
+    width: 80px;
 }
 
 .addIconContainer,
@@ -76,11 +81,4 @@
 .addIconContainer:focus,
 .removeIconContainer:focus {
     outline: 0;
-}
-
-.addIcon {
-    margin-right: auto;
-}
-.removeIcon {
-    margin-left: auto;
 }

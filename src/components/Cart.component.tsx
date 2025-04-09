@@ -62,6 +62,7 @@ function Cart({ items = [] }: CartProps) {
                                         >
                                             <AddIcon />
                                         </IconButton>
+                                        <hr />
                                         <IconButton
                                             aria-label="Decrease quantity"
                                             size="small"
