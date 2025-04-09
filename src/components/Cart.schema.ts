@@ -29,8 +29,8 @@ class CartItem {
         id: string | number = crypto.randomUUID()
     ) {
         z.number().int().nonnegative().parse(priceCents);
-        z.number().int().nonnegative().parse(remainingItems);
-        z.number().int().nonnegative().parse(quantity);
+        z.number().int().positive().parse(remainingItems);
+        z.number().int().positive().lte(remainingItems).parse(quantity);
 
         z.string()
             .url()

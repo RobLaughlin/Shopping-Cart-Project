@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { JSX, useState } from "react";
 
 import styles from "./Cart.module.css";
 import { CartItem } from "./Cart.schema";
