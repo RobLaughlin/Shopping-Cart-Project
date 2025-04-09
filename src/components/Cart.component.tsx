@@ -1,3 +1,4 @@
+import styles from "./Cart.module.css";
 import { CartItem } from "./Cart.schema";
 
 type CartProps = {
@@ -14,15 +15,16 @@ function Cart({ items = [] }: CartProps) {
                     const total = item.total(true);
 
                     return (
-                        <li key={item.id}>
-                            <ol>
-                                <li>ID: {id}</li>
-                                <li>NAME: {name}</li>
-                                <li>QUANTITY: {quantity}</li>
-                                <li>IMG: {imgURL.href}</li>
-                                <li>PRICE: {price}</li>
-                                <li>TOTAL: {total}</li>
-                            </ol>
+                        <li key={id} className={styles.cartItem}>
+                            <div className="card">
+                                <ol>
+                                    <li>NAME: {name}</li>
+                                    <li>QUANTITY: {quantity}</li>
+                                    <li>IMG: {imgURL.href}</li>
+                                    <li>PRICE: {price}</li>
+                                    <li>TOTAL: {total}</li>
+                                </ol>
+                            </div>
                         </li>
                     );
                 })}
