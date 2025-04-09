@@ -1,8 +1,8 @@
 .cart {
-    margin: auto;
     padding: 32px;
     background-color: white;
     color: black;
+    margin: 32px;
 }
 
 .cartItem {
@@ -40,15 +40,47 @@
 
 .itemName {
     font-size: min(4vw, 36px);
+    margin-bottom: 16px;
 }
 
-.priceAndQuantity {
+.price {
     margin-top: 16px;
+}
+
+.price,
+.quantity {
     font-size: min(3.5vw, 24px);
+}
+
+.itemsRemaining {
+    margin-top: 8px;
+    font-size: min(3vw, 18px);
 }
 
 .totalPrice {
     margin-top: auto;
     padding-top: 16px;
     font-size: min(3.5vw, 24px);
+}
+
+.quantityBtnContainer {
+    display: flex;
+    vertical-align: middle;
+}
+
+.addIconContainer,
+.removeIconContainer {
+    margin: auto;
+}
+
+.addIconContainer:focus,
+.removeIconContainer:focus {
+    outline: 0;
+}
+
+.addIcon {
+    margin-right: auto;
+}
+.removeIcon {
+    margin-left: auto;
 }

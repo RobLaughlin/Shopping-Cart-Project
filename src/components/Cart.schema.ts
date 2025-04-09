@@ -1,17 +1,22 @@
 import { z } from "zod";
 
+const VALID_IMAGE_FORMATS = [".png", ".jpg", ".jpeg", ".gif"];
+
 class CartItem {
     id: string | number;
     name: string;
     cents: number;
-    quantity: number;
+    remainingItems: number;
     imgURL: URL;
+
+    #quantity: number;
 
     /**
      * @constructor
      * @param name The name of the item
      * @param priceCents The price of the item in cents
      * @param quantity How many items purchased
+     * @param remainingItems How many of these items are left in the store
      * @param imgURL The image URL of the item
      * @param id The unique ID of the item
      */
@@ -19,21 +24,23 @@ class CartItem {
         name: string,
         priceCents: number,
         quantity: number,
+        remainingItems: number,
         imgURL: URL,
         id: string | number = crypto.randomUUID()
     ) {
         z.number().int().nonnegative().parse(priceCents);
+        z.number().int().nonnegative().parse(remainingItems);
         z.number().int().nonnegative().parse(quantity);
+
         z.string()
             .url()
             .refine(
                 (url) => {
-                    const validImageFormats = [".png", ".jpg", ".jpeg", ".gif"];
                     if (url.length < 4) {
                         return false;
                     }
 
-                    return validImageFormats.some((fmt) => url.endsWith(fmt));
+                    return VALID_IMAGE_FORMATS.some((fmt) => url.endsWith(fmt));
                 },
                 {
                     message: "Invalid image format",
@@ -43,9 +50,15 @@ class CartItem {
 
         this.name = name;
         this.cents = priceCents;
-        this.quantity = quantity;
+        this.remainingItems = remainingItems;
         this.imgURL = imgURL;
         this.id = id;
+
+        this.#quantity = Math.min(quantity, remainingItems);
+    }
+
+    get quantity() {
+        return this.#quantity;
     }
 
     /**
@@ -79,6 +92,17 @@ class CartItem {
             style: "currency",
             currency: "USD",
         });
+    }
+
+    /**
+     * Updates the quantity of this specific item to purchase.
+     * Cannot exceed the remaining number of items.
+     *
+     * @param quantity The new quantity of the item in the cart
+     */
+    updateQuantity(quantity: number): void {
+        z.number().int().nonnegative().parse(quantity);
+        this.#quantity = Math.max(1, Math.min(quantity, this.remainingItems));
     }
 }
 
