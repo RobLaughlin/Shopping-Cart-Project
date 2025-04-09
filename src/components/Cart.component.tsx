@@ -7,8 +7,8 @@ type CartProps = {
 
 function Cart({ items = [] }: CartProps) {
     return (
-        <div className="cart">
-            <ul>
+        <div className={styles.cart}>
+            <ul className={styles["no-list-style"]}>
                 {items.map((item) => {
                     const { id, name, quantity, imgURL } = item;
                     const price = item.price(true);
@@ -16,14 +16,28 @@ function Cart({ items = [] }: CartProps) {
 
                     return (
                         <li key={id} className={styles.cartItem}>
-                            <div className="card">
-                                <ol>
-                                    <li>NAME: {name}</li>
-                                    <li>QUANTITY: {quantity}</li>
-                                    <li>IMG: {imgURL.href}</li>
-                                    <li>PRICE: {price}</li>
-                                    <li>TOTAL: {total}</li>
-                                </ol>
+                            <div className={styles.card}>
+                                <img
+                                    src={imgURL.href}
+                                    alt="Item thumbnail"
+                                    className={styles.thumbnail}
+                                />
+                                <hr />
+                                <div className={styles.infoContainer}>
+                                    <h1 className={styles.itemName}>{name}</h1>
+                                    <div className={styles.priceAndQuantity}>
+                                        <p className={styles.price}>
+                                            Price: <b>{price}</b>
+                                        </p>
+                                        <p className={styles.quantity}>
+                                            Quantity: <b>{quantity}</b>
+                                        </p>
+                                    </div>
+
+                                    <p className={styles.totalPrice}>
+                                        Total Price: <b>{total}</b>
+                                    </p>
+                                </div>
                             </div>
                         </li>
                     );
