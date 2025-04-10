@@ -79,7 +79,7 @@ class CartItem {
 
     /**
      * Calculates the total price of the cart item
-     * @param toString Whether to return the total price as a bigint in cents or a formatted USD currency string
+     * @param toString Whether to return the total price as an integer in cents or a formatted USD currency string
      * @returns The total price in cents or a formatted string
      */
     total(toString: boolean = false): number | string {

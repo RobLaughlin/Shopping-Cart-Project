@@ -126,3 +126,71 @@ describe("CartItem data structure", () => {
         expect(item.total(true)).toBe("$0.20");
     });
 });
+
+describe("Cart component", () => {
+    const cartItems = [
+        new CartItem(
+            "Fjallraven - Foldsack No. 1 Backpack, Fits 15 Laptops",
+            10995,
+            3,
+            5,
+            new URL("https://fakestoreapi.com/img/81fPKd-2AYL._AC_SL1500_.jpg"),
+            1
+        ),
+        new CartItem(
+            "Mens Casual Premium Slim Fit T-Shirts",
+            2230,
+            6,
+            100,
+            new URL(
+                "https://fakestoreapi.com/img/71-3HjGNDUL._AC_SY879._SX._UX._SY._UY_.jpg"
+            ),
+            2
+        ),
+        new CartItem(
+            "Silicon Power 256GB SSD 3D NAND A55 SLC Cache Performance Boost SATA III 2.5",
+            10900,
+            1,
+            20,
+            new URL("https://fakestoreapi.com/img/71kWymZ+c+L._AC_SX679_.jpg"),
+            11
+        ),
+    ];
+
+    it("Renders text to the user if there are no items in the cart", () => {
+        render(<Cart items={[]} />);
+        render(<Cart />);
+        expect(screen.queryAllByText(/empty/i)).not.toStrictEqual([]);
+    });
+
+    it("Does not render empty when there are items in the cart", () => {
+        render(<Cart items={cartItems} />);
+        expect(screen.queryAllByText(/empty/i)).toStrictEqual([]);
+    });
+
+    it("Renders the formatted price and total cost (price * quantity) of each item", () => {
+        render(<Cart items={cartItems} />);
+        cartItems.forEach((item) => {
+            expect(screen.queryAllByText(item.price(true))).not.toStrictEqual(
+                []
+            );
+            expect(screen.queryAllByText(item.total(true))).not.toStrictEqual(
+                []
+            );
+        });
+    });
+
+    it("Renders the formatted total accumulated cost of all items", () => {
+        render(<Cart items={cartItems} />);
+        const cost = cartItems.reduce((acc, item) => {
+            return acc + (item.total(false) as number);
+        }, 0);
+
+        const costStr = (cost / 100).toLocaleString("en-US", {
+            style: "currency",
+            currency: "USD",
+        });
+
+        expect(screen.queryAllByText(costStr)).not.toStrictEqual([]);
+    });
+});

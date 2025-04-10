@@ -26,97 +26,118 @@ function Cart({ items = [] }: CartProps) {
             return acc + total;
         }, 0);
 
-        return "$" + (cost / 100).toString();
+        return (cost / 100).toLocaleString("en-US", {
+            style: "currency",
+            currency: "USD",
+        });
+    }
+
+    function renderItems(items: CartItem[]) {
+        return (
+            <>
+                <ul className={styles["no-list-style"]}>
+                    {items.map((item) => {
+                        const { id, name, quantity, remainingItems, imgURL } =
+                            item;
+                        const price = item.price(true);
+                        const total = item.total(true);
+
+                        return (
+                            <li key={id} className={styles.cartItem}>
+                                <div className={styles.card}>
+                                    <img
+                                        src={imgURL.href}
+                                        alt="Item thumbnail"
+                                        className={styles.thumbnail}
+                                    />
+                                    <hr />
+                                    <div className={styles.infoContainer}>
+                                        <h1 className={styles.itemName}>
+                                            {name}
+                                        </h1>
+                                        <hr />
+                                        <p className={styles.price}>
+                                            Price: <b>{price}</b>
+                                        </p>
+                                        <p className={styles.quantity}>
+                                            Quantity: <b>{quantity}</b>
+                                        </p>
+                                        <div
+                                            className={
+                                                styles.quantityBtnContainer
+                                            }
+                                        >
+                                            <IconButton
+                                                aria-label="Increase quantity"
+                                                size="small"
+                                                className={
+                                                    styles.addIconContainer
+                                                }
+                                                color="success"
+                                                onClick={() => {
+                                                    updateQuantity(
+                                                        item,
+                                                        quantity + 1
+                                                    );
+                                                }}
+                                            >
+                                                <AddIcon />
+                                            </IconButton>
+                                            <hr />
+                                            <IconButton
+                                                aria-label="Decrease quantity"
+                                                size="small"
+                                                className={
+                                                    styles.removeIconContainer
+                                                }
+                                                color="error"
+                                                onClick={() => {
+                                                    updateQuantity(
+                                                        item,
+                                                        quantity - 1
+                                                    );
+                                                }}
+                                            >
+                                                <RemoveIcon
+                                                    className={
+                                                        styles.removeIcon
+                                                    }
+                                                />
+                                            </IconButton>
+                                        </div>
+
+                                        <p className={styles.itemsRemaining}>
+                                            Items remaining:{" "}
+                                            <b>{remainingItems}</b>
+                                        </p>
+                                        <p className={styles.totalPrice}>
+                                            Total Price: <b>{total}</b>
+                                        </p>
+                                    </div>
+                                </div>
+                            </li>
+                        );
+                    })}
+                </ul>
+                <div className={styles.totalCostContainer}>
+                    <p>
+                        Total Cost: <b>{calculateTotalCost(items)}</b>
+                    </p>
+                    <Button
+                        variant="contained"
+                        className={styles.checkoutBtn}
+                        size="large"
+                    >
+                        Checkout
+                    </Button>
+                </div>
+            </>
+        );
     }
 
     return (
         <div className={styles.cart}>
-            <ul className={styles["no-list-style"]}>
-                {cartItems.map((item) => {
-                    const { id, name, quantity, remainingItems, imgURL } = item;
-                    const price = item.price(true);
-                    const total = item.total(true);
-
-                    return (
-                        <li key={id} className={styles.cartItem}>
-                            <div className={styles.card}>
-                                <img
-                                    src={imgURL.href}
-                                    alt="Item thumbnail"
-                                    className={styles.thumbnail}
-                                />
-                                <hr />
-                                <div className={styles.infoContainer}>
-                                    <h1 className={styles.itemName}>{name}</h1>
-                                    <hr />
-                                    <p className={styles.price}>
-                                        Price: <b>{price}</b>
-                                    </p>
-                                    <p className={styles.quantity}>
-                                        Quantity: <b>{quantity}</b>
-                                    </p>
-                                    <div
-                                        className={styles.quantityBtnContainer}
-                                    >
-                                        <IconButton
-                                            aria-label="Increase quantity"
-                                            size="small"
-                                            className={styles.addIconContainer}
-                                            color="success"
-                                            onClick={() => {
-                                                updateQuantity(
-                                                    item,
-                                                    quantity + 1
-                                                );
-                                            }}
-                                        >
-                                            <AddIcon />
-                                        </IconButton>
-                                        <hr />
-                                        <IconButton
-                                            aria-label="Decrease quantity"
-                                            size="small"
-                                            className={
-                                                styles.removeIconContainer
-                                            }
-                                            color="error"
-                                            onClick={() => {
-                                                updateQuantity(
-                                                    item,
-                                                    quantity - 1
-                                                );
-                                            }}
-                                        >
-                                            <RemoveIcon
-                                                className={styles.removeIcon}
-                                            />
-                                        </IconButton>
-                                    </div>
-
-                                    <p className={styles.itemsRemaining}>
-                                        Items remaining: <b>{remainingItems}</b>
-                                    </p>
-                                    <p className={styles.totalPrice}>
-                                        Total Price: <b>{total}</b>
-                                    </p>
-                                </div>
-                            </div>
-                        </li>
-                    );
-                })}
-            </ul>
-            <div className={styles.totalCostContainer}>
-                <p>
-                    Total Cost: <b>{calculateTotalCost(cartItems)}</b>
-                </p>
-                <Button
-                    variant="contained"
-                    className={styles.checkoutBtn}
-                    size="large"
-                >
-                    Checkout
-                </Button>
-            </div>
+            {cartItems.length > 0 ? renderItems(cartItems) : <p>empty</p>}
         </div>
     );
 }
