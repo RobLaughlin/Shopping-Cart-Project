@@ -68,7 +68,7 @@ function Cart({ items = [] }: CartProps) {
                                             }
                                         >
                                             <IconButton
-                                                aria-label="Increase quantity"
+                                                aria-label="IncreaseQuantity"
                                                 size="small"
                                                 className={
                                                     styles.addIconContainer
@@ -85,7 +85,7 @@ function Cart({ items = [] }: CartProps) {
                                             </IconButton>
                                             <hr />
                                             <IconButton
-                                                aria-label="Decrease quantity"
+                                                aria-label="DecreaseQuantity"
                                                 size="small"
                                                 className={
                                                     styles.removeIconContainer
