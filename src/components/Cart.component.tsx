@@ -43,7 +43,11 @@ function Cart({ items = [] }: CartProps) {
                         const total = item.total(true);
 
                         return (
-                            <li key={id} className={styles.cartItem}>
+                            <li
+                                key={id}
+                                className={styles.cartItem}
+                                data-testid={id}
+                            >
                                 <div className={styles.card}>
                                     <img
                                         src={imgURL.href}

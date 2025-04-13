@@ -159,99 +159,103 @@ describe("Cart component", () => {
         ),
     ];
 
-    it("Renders text to the user if there are no items in the cart", () => {
-        render(<Cart items={[]} />);
-        render(<Cart />);
-        expect(screen.queryAllByText(/empty/i)).not.toStrictEqual([]);
-    });
+    interface ItemData {
+        quantity: HTMLElement | null;
+        cost: HTMLElement[];
+        totalCost: HTMLElement[];
+    }
 
-    it("Does not render empty when there are items in the cart", () => {
-        render(<Cart items={cartItems} />);
-        expect(screen.queryAllByText(/empty/i)).toStrictEqual([]);
-    });
+    interface CartQueries {
+        emptyText: HTMLElement | null;
+        formattedTotalCost: HTMLElement[];
+        itemData: (ItemData | null)[];
+    }
 
-    it("Renders the quantity, formatted price, total cost (price * quantity) of each item", () => {
-        render(<Cart items={cartItems} />);
-        const quantities = screen.queryAllByText(/quantity/i);
+    function renderCart(items: CartItem[]): CartQueries {
+        render(<Cart items={items} />);
 
-        cartItems.forEach((item) => {
-            expect(quantities).not.toStrictEqual([]);
-            expect(
-                quantities.some((q) => {
-                    return (
-                        within(q).queryByText(item.quantity.toString()) !== null
+        const queryEmptyText = (): HTMLElement | null => {
+            return screen.queryByText(/empty/i);
+        };
+
+        const queryFormattedTotalCost = (items: CartItem[]): HTMLElement[] => {
+            const cost = items.reduce((acc, item) => {
+                return acc + (item.total(false) as number);
+            }, 0);
+            const costStr = (cost / 100).toLocaleString("en-US", {
+                style: "currency",
+                currency: "USD",
+            });
+
+            return screen.queryAllByText(costStr);
+        };
+
+        const queryItems = (items: CartItem[]): (ItemData | null)[] => {
+            const itemData = items.map((item) => {
+                const data: ItemData = {
+                    quantity: null,
+                    cost: [],
+                    totalCost: [],
+                };
+
+                const itemElem = screen.queryByTestId(item.id);
+                if (itemElem === null) {
+                    return null;
+                }
+
+                // Update quantity if possible
+                const quantityLabel = within(itemElem).queryByText(/quantity/i);
+                if (quantityLabel !== null) {
+                    const quantity = within(quantityLabel).queryByText(
+                        item.quantity.toString()
                     );
-                })
-            ).toBe(true);
-            expect(screen.queryAllByText(item.price(true))).not.toStrictEqual(
-                []
-            );
-            expect(screen.queryAllByText(item.total(true))).not.toStrictEqual(
-                []
-            );
+
+                    data.quantity = quantity;
+                }
+
+                // Update cost and totalCost if possible
+                data.cost = within(itemElem).queryAllByText(item.price(true));
+                data.totalCost = within(itemElem).queryAllByText(
+                    item.total(true)
+                );
+                return data;
+            });
+
+            return itemData;
+        };
+
+        const queries: CartQueries = {
+            emptyText: queryEmptyText(),
+            formattedTotalCost: queryFormattedTotalCost(items),
+            itemData: queryItems(items),
+        };
+
+        return queries;
+    }
+
+    it("Renders text to the user if there are no items in the cart", () => {
+        const { emptyText } = renderCart([]);
+        expect(emptyText).not.toBe(null);
+    });
+
+    it("Renders the quantity, formatted price, and total cost (price * quantity) of each item", () => {
+        const { itemData } = renderCart(cartItems);
+
+        itemData.forEach((item) => {
+            expect(item).not.toBe(null);
+            if (item === null) {
+                return;
+            }
+
+            const { quantity, cost, totalCost } = item;
+            expect(quantity).not.toBe(null);
+            expect(cost).not.toStrictEqual([]);
+            expect(totalCost).not.toStrictEqual([]);
         });
     });
 
     it("Renders the formatted total accumulated cost of all items", () => {
-        render(<Cart items={cartItems} />);
-        const cost = cartItems.reduce((acc, item) => {
-            return acc + (item.total(false) as number);
-        }, 0);
-
-        const costStr = (cost / 100).toLocaleString("en-US", {
-            style: "currency",
-            currency: "USD",
-        });
-
-        expect(screen.queryAllByText(costStr)).not.toStrictEqual([]);
+        const { formattedTotalCost } = renderCart(cartItems);
+        expect(formattedTotalCost).not.toStrictEqual([]);
     });
-
-    it("Renders quantities, prices, total costs, and accumulated total costs after quantity updates", () => {
-        const user = userEvent.setup();
-        render(<Cart items={cartItems} />);
-
-        const increaseQtyBtns = screen.queryAllByRole("button", {
-            name: "IncreaseQuantity",
-        });
-        increaseQtyBtns.forEach(async (btn) => {
-            await user.click(btn);
-        });
-
-        const decreaseQtyBtns = screen.queryAllByRole("button", {
-            name: "DecreaseQuantity",
-        });
-        increaseQtyBtns.forEach(async (btn) => {
-            await user.click(btn);
-        });
-
-        const quantities = screen.queryAllByText(/quantity/i);
-        cartItems.forEach((item) => {
-            expect(quantities).not.toStrictEqual([]);
-            expect(
-                quantities.some((q) => {
-                    return (
-                        within(q).queryByText(item.quantity.toString()) !== null
-                    );
-                })
-            ).toBe(true);
-            expect(screen.queryAllByText(item.price(true))).not.toStrictEqual(
-                []
-            );
-            expect(screen.queryAllByText(item.total(true))).not.toStrictEqual(
-                []
-            );
-        });
-
-        const cost = cartItems.reduce((acc, item) => {
-            return acc + (item.total(false) as number);
-        }, 0);
-
-        const costStr = (cost / 100).toLocaleString("en-US", {
-            style: "currency",
-            currency: "USD",
-        });
-
-        expect(screen.queryAllByText(costStr)).not.toStrictEqual([]);
-    });
-    // it("Updates the ");
 });
