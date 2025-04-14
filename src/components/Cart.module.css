@@ -33,6 +33,7 @@
     border: 1px solid rgba(211, 211, 211, 0.1);
     border-radius: 4px;
     padding: 16px;
+    padding-bottom: 0;
     margin: 0 auto 0 16px;
     width: 100%;
     display: flex;
@@ -59,9 +60,10 @@
 }
 
 .totalPrice {
-    margin-top: auto;
-    padding-top: 16px;
     font-size: min(3.5vw, 24px);
+    margin-top: auto;
+    margin-bottom: auto;
+    margin-right: auto;
 }
 
 .quantityBtnContainer {
@@ -80,7 +82,8 @@
 }
 
 .addIconContainer:focus,
-.removeIconContainer:focus {
+.removeIconContainer:focus,
+.removeItem:focus {
     outline: 0;
 }
 
@@ -101,4 +104,16 @@
 
 .outOfStock {
     color: red;
+}
+
+.itemFooter {
+    display: flex;
+    text-align: center;
+    margin-top: auto;
+    margin-bottom: 0;
+    padding-top: 16px;
+}
+
+.removeItem {
+    margin-left: auto;
 }

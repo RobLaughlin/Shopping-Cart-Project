@@ -5,9 +5,9 @@ import { CartItem } from "./Cart.schema";
 
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
+import CloseIcon from "@mui/icons-material/Close";
 import IconButton from "@mui/material/IconButton";
 import Button from "@mui/material/Button";
-import { QuestionMark } from "@mui/icons-material";
 
 type CartProps = {
     items?: CartItem[];
@@ -27,7 +27,12 @@ function Cart({ items = [] }: CartProps) {
         }),
     ]);
 
-    function updateQuantity(item: CartItem, quantity: number) {
+    function updateQuantity(key: number | string, quantity: number): void {
+        const item = cartItems.find((item) => item.id === key);
+        if (item === null || item === undefined) {
+            return;
+        }
+
         item.updateQuantity(quantity);
         setCartItems([
             ...cartItems.map((itm) => {
@@ -40,6 +45,23 @@ function Cart({ items = [] }: CartProps) {
                     itm.id
                 );
             }),
+        ]);
+    }
+
+    function removeItem(key: number | string): void {
+        setCartItems([
+            ...cartItems
+                .filter((item) => item.id !== key)
+                .map((itm) => {
+                    return new CartItem(
+                        itm.name,
+                        itm.price(false) as number,
+                        itm.quantity,
+                        itm.remainingItems,
+                        itm.imgURL,
+                        itm.id
+                    );
+                }),
         ]);
     }
 
@@ -104,7 +126,7 @@ function Cart({ items = [] }: CartProps) {
                                                 color="success"
                                                 onClick={() => {
                                                     updateQuantity(
-                                                        item,
+                                                        item.id as number,
                                                         quantity + 1
                                                     );
                                                 }}
@@ -122,16 +144,12 @@ function Cart({ items = [] }: CartProps) {
                                                 color="error"
                                                 onClick={() => {
                                                     updateQuantity(
-                                                        item,
+                                                        item.id,
                                                         quantity - 1
                                                     );
                                                 }}
                                             >
-                                                <RemoveIcon
-                                                    className={
-                                                        styles.removeIcon
-                                                    }
-                                                />
+                                                <RemoveIcon />
                                             </IconButton>
                                         </div>
 
@@ -151,9 +169,23 @@ function Cart({ items = [] }: CartProps) {
                                                 </b>
                                             )}
                                         </p>
-                                        <p className={styles.totalPrice}>
-                                            Total Price: <b>{total}</b>
-                                        </p>
+                                        <div className={styles.itemFooter}>
+                                            <p className={styles.totalPrice}>
+                                                Total Price: <b>{total}</b>
+                                            </p>
+                                            <IconButton
+                                                data-testid="RemoveItem"
+                                                aria-label="RemoveItem"
+                                                size="large"
+                                                className={styles.removeItem}
+                                                color="error"
+                                                onClick={() => {
+                                                    removeItem(item.id);
+                                                }}
+                                            >
+                                                <CloseIcon fontSize="large" />
+                                            </IconButton>
+                                        </div>
                                     </div>
                                 </div>
                             </li>
@@ -178,7 +210,11 @@ function Cart({ items = [] }: CartProps) {
 
     return (
         <div className={styles.cart}>
-            {cartItems.length > 0 ? renderItems(cartItems) : <p>empty</p>}
+            {cartItems.length > 0 ? (
+                renderItems(cartItems)
+            ) : (
+                <p>Shopping cart is empty</p>
+            )}
         </div>
     );
 }
