@@ -7,6 +7,7 @@ import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import IconButton from "@mui/material/IconButton";
 import Button from "@mui/material/Button";
+import { QuestionMark } from "@mui/icons-material";
 
 type CartProps = {
     items?: CartItem[];
@@ -17,7 +18,18 @@ function Cart({ items = [] }: CartProps) {
 
     function updateQuantity(item: CartItem, quantity: number) {
         item.updateQuantity(quantity);
-        setCartItems([...cartItems]);
+        setCartItems([
+            ...cartItems.map((itm) => {
+                return new CartItem(
+                    itm.name,
+                    itm.price(false) as number,
+                    itm.quantity,
+                    itm.remainingItems,
+                    itm.imgURL,
+                    itm.id
+                );
+            }),
+        ]);
     }
 
     function calculateTotalCost(items: CartItem[]) {
@@ -72,6 +84,7 @@ function Cart({ items = [] }: CartProps) {
                                             }
                                         >
                                             <IconButton
+                                                data-testid="IncreaseQuantity"
                                                 aria-label="IncreaseQuantity"
                                                 size="small"
                                                 className={
@@ -89,6 +102,7 @@ function Cart({ items = [] }: CartProps) {
                                             </IconButton>
                                             <hr />
                                             <IconButton
+                                                data-testid="DecreaseQuantity"
                                                 aria-label="DecreaseQuantity"
                                                 size="small"
                                                 className={

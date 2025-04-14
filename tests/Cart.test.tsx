@@ -160,6 +160,7 @@ describe("Cart component", () => {
     ];
 
     interface ItemData {
+        id: string | number;
         quantity: HTMLElement | null;
         cost: HTMLElement[];
         totalCost: HTMLElement[];
@@ -171,8 +172,25 @@ describe("Cart component", () => {
         itemData: (ItemData | null)[];
     }
 
-    function renderCart(items: CartItem[]): CartQueries {
-        render(<Cart items={items} />);
+    function renderCart(items: CartItem[], rerender = true): CartQueries {
+        if (rerender) {
+            render(
+                <Cart
+                    items={[
+                        ...items.map((itm) => {
+                            return new CartItem(
+                                itm.name,
+                                itm.price(false) as number,
+                                itm.quantity,
+                                itm.remainingItems,
+                                itm.imgURL,
+                                itm.id
+                            );
+                        }),
+                    ]}
+                />
+            );
+        }
 
         const queryEmptyText = (): HTMLElement | null => {
             return screen.queryByText(/empty/i);
@@ -193,6 +211,7 @@ describe("Cart component", () => {
         const queryItems = (items: CartItem[]): (ItemData | null)[] => {
             const itemData = items.map((item) => {
                 const data: ItemData = {
+                    id: item.id,
                     quantity: null,
                     cost: [],
                     totalCost: [],
@@ -257,5 +276,64 @@ describe("Cart component", () => {
     it("Renders the formatted total accumulated cost of all items", () => {
         const { formattedTotalCost } = renderCart(cartItems);
         expect(formattedTotalCost).not.toStrictEqual([]);
+    });
+
+    it("Renders the correct quantities, costs, and total costs after user increases or decreases the quantity", async () => {
+        const user = userEvent.setup();
+
+        const prevCart = renderCart(cartItems, true);
+
+        for (let i = 0; i < cartItems.length; i++) {
+            const item = cartItems[i];
+            const itemElem = screen.queryByTestId(item.id.toString());
+            expect(itemElem).not.toBe(null);
+            if (itemElem === null) {
+                break;
+            }
+
+            function passExpectations() {
+                const { itemData, formattedTotalCost } = renderCart(
+                    cartItems,
+                    false
+                );
+
+                const thisItem = itemData.find(
+                    (curItem) => curItem?.id === item.id
+                );
+
+                expect(thisItem).not.toBe(null);
+                expect(thisItem).not.toBe(undefined);
+                if (thisItem !== null && thisItem !== undefined) {
+                    const { quantity, cost, totalCost } = thisItem;
+                    expect(quantity).not.toBe(null);
+                    expect(cost).not.toStrictEqual([]);
+                    expect(totalCost).not.toStrictEqual([]);
+                }
+
+                expect(formattedTotalCost).not.toStrictEqual([]);
+            }
+
+            const increaseBtn =
+                within(itemElem).queryByTestId("IncreaseQuantity");
+            expect(increaseBtn).not.toBe(null);
+            if (increaseBtn === null) {
+                break;
+            }
+
+            await user.click(increaseBtn);
+            item.updateQuantity(item.quantity + 1);
+            passExpectations();
+
+            const decreaseBtn =
+                within(itemElem).queryByTestId("DecreaseQuantity");
+            expect(decreaseBtn).not.toBe(null);
+            if (decreaseBtn === null) {
+                break;
+            }
+
+            await user.click(decreaseBtn);
+            item.updateQuantity(item.quantity - 1);
+            passExpectations();
+        }
     });
 });
