@@ -14,7 +14,18 @@ type CartProps = {
 };
 
 function Cart({ items = [] }: CartProps) {
-    const [cartItems, setCartItems] = useState(items);
+    const [cartItems, setCartItems] = useState([
+        ...items.map((itm) => {
+            return new CartItem(
+                itm.name,
+                itm.price(false) as number,
+                itm.quantity,
+                itm.remainingItems,
+                itm.imgURL,
+                itm.id
+            );
+        }),
+    ]);
 
     function updateQuantity(item: CartItem, quantity: number) {
         item.updateQuantity(quantity);
@@ -125,8 +136,20 @@ function Cart({ items = [] }: CartProps) {
                                         </div>
 
                                         <p className={styles.itemsRemaining}>
-                                            Items remaining:{" "}
-                                            <b>{remainingItems}</b>
+                                            {remainingItems !== 0 ? (
+                                                <>
+                                                    Items remaining:{" "}
+                                                    <b>{item.remainingItems}</b>
+                                                </>
+                                            ) : (
+                                                <b
+                                                    className={
+                                                        styles.outOfStock
+                                                    }
+                                                >
+                                                    OUT OF STOCK
+                                                </b>
+                                            )}
                                         </p>
                                         <p className={styles.totalPrice}>
                                             Total Price: <b>{total}</b>

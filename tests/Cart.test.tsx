@@ -27,7 +27,7 @@ describe("CartItem data structure", () => {
         }).not.toThrowError();
     });
 
-    it("Only accepts positive integer quantities", () => {
+    it("Only accepts non-negative integer quantities", () => {
         expect(() => {
             new CartItem("name", 1, 0.5, 5, img);
         }).toThrowError();
@@ -38,14 +38,14 @@ describe("CartItem data structure", () => {
 
         expect(() => {
             new CartItem("name", 1, 0, 5, img);
-        }).toThrowError();
+        }).not.toThrowError();
 
         expect(() => {
             new CartItem("name", 1, 1, 5, img);
         }).not.toThrowError();
     });
 
-    it("Only accepts positive integer remaining items", () => {
+    it("Only accepts non-negative integer remaining items", () => {
         expect(() => {
             new CartItem("name", 1, 1, -1, img);
         }).toThrowError();
@@ -55,8 +55,8 @@ describe("CartItem data structure", () => {
         }).toThrowError();
 
         expect(() => {
-            new CartItem("name", 1, 1, 0, img);
-        }).toThrowError();
+            new CartItem("name", 1, 0, 0, img);
+        }).not.toThrowError();
 
         expect(() => {
             new CartItem("name", 1, 1, 1, img);
@@ -77,8 +77,12 @@ describe("CartItem data structure", () => {
         }).not.toThrowError();
     });
 
-    it("Clamps quantities between [1, remainingItems]", () => {
-        function updateQuantity(initQuantity, newQuantity, remainingItems) {
+    it("Clamps quantities between [0, remainingItems]", () => {
+        function updateQuantity(
+            initQuantity: number,
+            newQuantity: number,
+            remainingItems: number
+        ) {
             const item = new CartItem(
                 "name",
                 1,
@@ -93,11 +97,8 @@ describe("CartItem data structure", () => {
         expect(updateQuantity(3, 6, 5)).toBe(5);
         expect(updateQuantity(3, 5, 5)).toBe(5);
         expect(updateQuantity(3, 4, 5)).toBe(4);
-        expect(updateQuantity(3, 0, 5)).toBe(1);
-
-        expect(() => {
-            updateQuantity(3, -1, 5);
-        }).toThrowError();
+        expect(updateQuantity(3, 0, 5)).toBe(0);
+        expect(updateQuantity(3, -1, 5)).toBe(0);
 
         expect(() => {
             updateQuantity(3, 0.5, 5);
@@ -157,6 +158,14 @@ describe("Cart component", () => {
             new URL("https://fakestoreapi.com/img/71kWymZ+c+L._AC_SX679_.jpg"),
             11
         ),
+        new CartItem(
+            "DANVOUY Womens T Shirt Casual Cotton Short",
+            1299,
+            0,
+            0,
+            new URL("https://fakestoreapi.com/img/61pHAEJ4NML._AC_UX679_.jpg"),
+            20
+        ),
     ];
 
     interface ItemData {
@@ -164,6 +173,7 @@ describe("Cart component", () => {
         quantity: HTMLElement | null;
         cost: HTMLElement[];
         totalCost: HTMLElement[];
+        itemsRemaining: HTMLElement | null;
     }
 
     interface CartQueries {
@@ -215,6 +225,7 @@ describe("Cart component", () => {
                     quantity: null,
                     cost: [],
                     totalCost: [],
+                    itemsRemaining: null,
                 };
 
                 const itemElem = screen.queryByTestId(item.id);
@@ -232,11 +243,26 @@ describe("Cart component", () => {
                     data.quantity = quantity;
                 }
 
-                // Update cost and totalCost if possible
+                // Query cost and totalCost if possible
                 data.cost = within(itemElem).queryAllByText(item.price(true));
                 data.totalCost = within(itemElem).queryAllByText(
                     item.total(true)
                 );
+
+                // Query remaining items
+                if (item.remainingItems === 0) {
+                    data.itemsRemaining =
+                        within(itemElem).queryByText(/out of stock/i);
+                } else {
+                    const itemsRemaining =
+                        within(itemElem).queryByText(/items remaining/i);
+                    if (itemsRemaining !== null) {
+                        data.itemsRemaining = within(
+                            itemsRemaining
+                        ).queryByText(item.remainingItems.toString());
+                    }
+                }
+
                 return data;
             });
 
@@ -335,5 +361,18 @@ describe("Cart component", () => {
             item.updateQuantity(item.quantity - 1);
             passExpectations();
         }
+    });
+
+    it("Shows how many items are remaining and out of stock if that number is 0", () => {
+        const { itemData } = renderCart(cartItems);
+        itemData.forEach((item) => {
+            expect(item).not.toBe(null);
+            if (item === null) {
+                return;
+            }
+
+            const { itemsRemaining } = item;
+            expect(itemsRemaining).not.toBe(null);
+        });
     });
 });

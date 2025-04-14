@@ -29,8 +29,8 @@ class CartItem {
         id: string | number = crypto.randomUUID()
     ) {
         z.number().int().nonnegative().parse(priceCents);
-        z.number().int().positive().parse(remainingItems);
-        z.number().int().positive().lte(remainingItems).parse(quantity);
+        z.number().int().nonnegative().parse(remainingItems);
+        z.number().int().nonnegative().lte(remainingItems).parse(quantity);
 
         z.string()
             .url()
@@ -63,7 +63,7 @@ class CartItem {
 
     /**
      * Calculates the price of the single cart item
-     * @param toString Whether to return the item price as a bigint in cents or a formatted USD currency string
+     * @param toString Whether to return the item price as an integer in cents or a formatted USD currency string
      * @returns The item price in cents or a formatted string
      */
     price(toString: boolean = false): number | string {
@@ -101,8 +101,8 @@ class CartItem {
      * @param quantity The new quantity of the item in the cart
      */
     updateQuantity(quantity: number): void {
-        z.number().int().nonnegative().parse(quantity);
-        this.#quantity = Math.max(1, Math.min(quantity, this.remainingItems));
+        z.number().int().parse(quantity);
+        this.#quantity = Math.max(0, Math.min(quantity, this.remainingItems));
     }
 }
 

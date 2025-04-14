@@ -98,3 +98,7 @@
 .checkoutBtn:focus {
     outline: 0 !important;
 }
+
+.outOfStock {
+    color: red;
+}

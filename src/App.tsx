@@ -30,6 +30,14 @@ function App() {
             new URL("https://fakestoreapi.com/img/71kWymZ+c+L._AC_SX679_.jpg"),
             11
         ),
+        new CartItem(
+            "DANVOUY Womens T Shirt Casual Cotton Short",
+            1299,
+            0,
+            0,
+            new URL("https://fakestoreapi.com/img/61pHAEJ4NML._AC_UX679_.jpg"),
+            20
+        ),
     ];
 
     return (
