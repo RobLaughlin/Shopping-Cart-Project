@@ -375,4 +375,34 @@ describe("Cart component", () => {
             expect(itemsRemaining).not.toBe(null);
         });
     });
+
+    it("Removes the item when the remove item button is clicked", async () => {
+        const user = userEvent.setup();
+        const { itemData } = renderCart(cartItems);
+
+        for (let i = 0; i < itemData.length; i++) {
+            const item = itemData[i];
+            expect(item).not.toBe(null);
+            if (item === null) {
+                return;
+            }
+
+            const itemElem = screen.queryByTestId(item.id.toString());
+            expect(itemElem).not.toBe(null);
+            if (itemElem === null) {
+                return;
+            }
+
+            const removeItemBtn = within(itemElem).queryByTestId("RemoveItem");
+            expect(removeItemBtn).not.toBe(null);
+            if (removeItemBtn === null) {
+                return;
+            }
+
+            await user.click(removeItemBtn);
+
+            // Verify that the item was removed
+            expect(screen.queryByTestId(item.id.toString())).toBe(null);
+        }
+    });
 });
