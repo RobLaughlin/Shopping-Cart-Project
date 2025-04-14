@@ -1,7 +1,7 @@
-import { JSX, useState } from "react";
+import { useState } from "react";
 
 import styles from "./Cart.module.css";
-import { CartItem } from "./Cart.schema";
+import { ProductItem } from "../../Schemas/ProductItem.schema";
 
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
@@ -10,13 +10,13 @@ import IconButton from "@mui/material/IconButton";
 import Button from "@mui/material/Button";
 
 type CartProps = {
-    items?: CartItem[];
+    items?: ProductItem[];
 };
 
 function Cart({ items = [] }: CartProps) {
-    const [cartItems, setCartItems] = useState([
+    const [ProductItems, setProductItems] = useState([
         ...items.map((itm) => {
-            return new CartItem(
+            return new ProductItem(
                 itm.name,
                 itm.price(false) as number,
                 itm.quantity,
@@ -28,15 +28,15 @@ function Cart({ items = [] }: CartProps) {
     ]);
 
     function updateQuantity(key: number | string, quantity: number): void {
-        const item = cartItems.find((item) => item.id === key);
+        const item = ProductItems.find((item) => item.id === key);
         if (item === null || item === undefined) {
             return;
         }
 
         item.updateQuantity(quantity);
-        setCartItems([
-            ...cartItems.map((itm) => {
-                return new CartItem(
+        setProductItems([
+            ...ProductItems.map((itm) => {
+                return new ProductItem(
                     itm.name,
                     itm.price(false) as number,
                     itm.quantity,
@@ -49,23 +49,21 @@ function Cart({ items = [] }: CartProps) {
     }
 
     function removeItem(key: number | string): void {
-        setCartItems([
-            ...cartItems
-                .filter((item) => item.id !== key)
-                .map((itm) => {
-                    return new CartItem(
-                        itm.name,
-                        itm.price(false) as number,
-                        itm.quantity,
-                        itm.remainingItems,
-                        itm.imgURL,
-                        itm.id
-                    );
-                }),
+        setProductItems([
+            ...ProductItems.filter((item) => item.id !== key).map((itm) => {
+                return new ProductItem(
+                    itm.name,
+                    itm.price(false) as number,
+                    itm.quantity,
+                    itm.remainingItems,
+                    itm.imgURL,
+                    itm.id
+                );
+            }),
         ]);
     }
 
-    function calculateTotalCost(items: CartItem[]) {
+    function calculateTotalCost(items: ProductItem[]) {
         const totals = items.map((item) => item.total(false) as number);
         const cost = totals.reduce((acc, total) => {
             return acc + total;
@@ -77,7 +75,7 @@ function Cart({ items = [] }: CartProps) {
         });
     }
 
-    function renderItems(items: CartItem[]) {
+    function renderItems(items: ProductItem[]) {
         return (
             <>
                 <ul className={styles["no-list-style"]}>
@@ -90,7 +88,7 @@ function Cart({ items = [] }: CartProps) {
                         return (
                             <li
                                 key={id}
-                                className={styles.cartItem}
+                                className={styles.ProductItem}
                                 data-testid={id}
                             >
                                 <div className={styles.card}>
@@ -210,8 +208,8 @@ function Cart({ items = [] }: CartProps) {
 
     return (
         <div className={styles.cart}>
-            {cartItems.length > 0 ? (
-                renderItems(cartItems)
+            {ProductItems.length > 0 ? (
+                renderItems(ProductItems)
             ) : (
                 <p>Shopping cart is empty</p>
             )}

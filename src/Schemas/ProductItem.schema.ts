@@ -2,7 +2,7 @@ import { z } from "zod";
 
 const VALID_IMAGE_FORMATS = [".png", ".jpg", ".jpeg", ".gif"];
 
-class CartItem {
+class ProductItem {
     id: string | number;
     name: string;
     cents: number;
@@ -106,4 +106,4 @@ class CartItem {
     }
 }
 
-export { CartItem };
+export { ProductItem };

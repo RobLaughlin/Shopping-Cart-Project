@@ -1,0 +1,121 @@
+.products {
+    padding: 32px;
+    background-color: white;
+    color: black;
+    margin: 32px;
+    cursor: default;
+}
+
+.productItem {
+    border: 2px solid rgba(128, 128, 128, 0.5);
+    border-radius: 4px;
+    width: 100%;
+    margin-bottom: 16px;
+}
+
+.no-list-style {
+    list-style-type: none;
+}
+
+.card {
+    padding: 16px;
+    display: flex;
+}
+
+.thumbnail {
+    width: 30%;
+    max-width: 300px;
+    margin: auto 0 auto 0;
+    padding-right: 16px;
+}
+
+.infoContainer {
+    border: 1px solid rgba(211, 211, 211, 0.1);
+    border-radius: 4px;
+    padding: 16px;
+    padding-bottom: 0;
+    margin: 0 auto 0 16px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.itemName {
+    font-size: min(4vw, 36px);
+    margin-bottom: 16px;
+}
+
+.price {
+    margin-top: 16px;
+}
+
+.price,
+.quantity {
+    font-size: min(3.5vw, 24px);
+}
+
+.itemsRemaining {
+    margin-top: 8px;
+    font-size: min(3vw, 18px);
+}
+
+.totalPrice {
+    font-size: min(3.5vw, 24px);
+    margin-top: auto;
+    margin-bottom: auto;
+    margin-right: auto;
+}
+
+.quantityBtnContainer {
+    display: grid;
+    margin-top: 8px;
+    grid-template-columns: 1fr 2px 1fr;
+    vertical-align: middle;
+    border: 1px solid lightgray;
+    border-radius: 4px;
+    width: 80px;
+}
+
+.addIconContainer,
+.removeIconContainer {
+    margin: auto;
+}
+
+.addIconContainer:focus,
+.removeIconContainer:focus,
+.removeItem:focus {
+    outline: 0;
+}
+
+.totalCostContainer {
+    display: flex;
+    font-size: 48px;
+    width: 100%;
+}
+
+.viewCartContainer {
+    display: flex;
+    width: 100%;
+    margin-top: 16px;
+}
+
+.viewCartBtn {
+    margin-left: auto !important;
+    width: 35%;
+}
+
+.checkoutBtn:focus {
+    outline: 0 !important;
+}
+
+.outOfStock {
+    color: red;
+}
+
+.itemFooter {
+    display: flex;
+    text-align: center;
+    margin-top: auto;
+    margin-bottom: 0;
+    padding-top: 16px;
+}

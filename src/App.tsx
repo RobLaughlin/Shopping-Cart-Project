@@ -1,10 +1,11 @@
 import "./App.css";
-import Cart from "./components/Cart.component";
-import { CartItem } from "./components/Cart.schema";
+import Cart from "./components/Cart/Cart.component";
+import ProductList from "./components/ProductList/ProductList.component";
+import { ProductItem } from "./Schemas/ProductItem.schema";
 
 function App() {
     const items = [
-        new CartItem(
+        new ProductItem(
             "Fjallraven - Foldsack No. 1 Backpack, Fits 15 Laptops",
             10995,
             3,
@@ -12,7 +13,7 @@ function App() {
             new URL("https://fakestoreapi.com/img/81fPKd-2AYL._AC_SL1500_.jpg"),
             1
         ),
-        new CartItem(
+        new ProductItem(
             "Mens Casual Premium Slim Fit T-Shirts",
             2230,
             6,
@@ -22,7 +23,7 @@ function App() {
             ),
             2
         ),
-        new CartItem(
+        new ProductItem(
             "Silicon Power 256GB SSD 3D NAND A55 SLC Cache Performance Boost SATA III 2.5",
             10900,
             1,
@@ -30,7 +31,7 @@ function App() {
             new URL("https://fakestoreapi.com/img/71kWymZ+c+L._AC_SX679_.jpg"),
             11
         ),
-        new CartItem(
+        new ProductItem(
             "DANVOUY Womens T Shirt Casual Cotton Short",
             1299,
             0,
@@ -42,7 +43,8 @@ function App() {
 
     return (
         <div id="App">
-            <Cart items={items} />
+            {/* <Cart items={items} /> */}
+            <ProductList items={items} />
         </div>
     );
 }
