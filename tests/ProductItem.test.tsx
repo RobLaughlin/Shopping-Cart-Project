@@ -1,126 +1,109 @@
 import { describe, it, expect } from "vitest";
-import { ProductItem } from "../src/Schemas/ProductItem.schema";
+import {
+    ProductItemWithStock,
+    PRODUCT_ITEM_WITH_STOCK_SCHEMA,
+} from "../src/Schemas/ProductItem.schema";
+import { cloneDeep } from "lodash-es";
 
 describe("ProductItem data structure", () => {
-    const img = new URL("http://localhost/test.png");
+    const testItem: ProductItemWithStock = {
+        id: 1,
+        title: "Fjallraven - Foldsack No. 1 Backpack, Fits 15 Laptops",
+        price: 109.95,
+        description:
+            "Your perfect pack for everyday use and walks in the forest. Stash your laptop (up to 15 inches) in the padded sleeve, your everyday",
+        category: "men's clothing",
+        image: "https://fakestoreapi.com/img/81fPKd-2AYL._AC_SL1500_.jpg",
+        rating: {
+            rate: 3.9,
+            count: 120,
+        },
+        stock: 10,
+        quantity: 0,
+    };
 
-    it("Only accepts non-negative integer prices", () => {
-        expect(() => {
-            new ProductItem("name", 0.5, 2, 5, img);
-        }).toThrowError();
+    type Test = {
+        mod: object;
+        toThrowError: boolean;
+    };
 
-        expect(() => {
-            new ProductItem("name", -1, 2, 5, img);
-        }).toThrowError();
+    // Given an array of modifications to the test item and an expected result
+    function runModificationTests(
+        itemToTest: ProductItemWithStock,
+        tests: Test[]
+    ) {
+        tests.forEach(({ mod, toThrowError }) => {
+            const item = cloneDeep(itemToTest);
+            for (const key in mod) {
+                item[key] = mod[key];
+            }
 
-        expect(() => {
-            new ProductItem("name", 0, 2, 5, img);
-        }).not.toThrowError();
+            const test = expect(() => {
+                PRODUCT_ITEM_WITH_STOCK_SCHEMA.parse(item);
+            });
+            toThrowError ? test.toThrowError() : test.not.toThrowError();
+        });
+    }
 
-        expect(() => {
-            new ProductItem("name", 1, 2, 5, img);
-        }).not.toThrowError();
+    it("Only accepts non-negative prices", () => {
+        const tests: Test[] = [
+            { mod: { price: -0.5 }, toThrowError: true },
+            { mod: { price: -1 }, toThrowError: true },
+            { mod: { price: 0.5 }, toThrowError: false },
+            { mod: { price: 0 }, toThrowError: false },
+            { mod: { price: 1 }, toThrowError: false },
+        ];
+
+        runModificationTests(testItem, tests);
     });
 
     it("Only accepts non-negative integer quantities", () => {
-        expect(() => {
-            new ProductItem("name", 1, 0.5, 5, img);
-        }).toThrowError();
+        const tests: Test[] = [
+            { mod: { quantity: -0.5 }, toThrowError: true },
+            { mod: { quantity: -1 }, toThrowError: true },
+            { mod: { quantity: 0.5 }, toThrowError: true },
+            { mod: { quantity: 0 }, toThrowError: false },
+            { mod: { quantity: 1 }, toThrowError: false },
+        ];
 
-        expect(() => {
-            new ProductItem("name", 1, -1, 5, img);
-        }).toThrowError();
-
-        expect(() => {
-            new ProductItem("name", 1, 0, 5, img);
-        }).not.toThrowError();
-
-        expect(() => {
-            new ProductItem("name", 1, 1, 5, img);
-        }).not.toThrowError();
+        runModificationTests(testItem, tests);
     });
 
-    it("Only accepts non-negative integer remaining items", () => {
-        expect(() => {
-            new ProductItem("name", 1, 1, -1, img);
-        }).toThrowError();
-
-        expect(() => {
-            new ProductItem("name", 1, 1, 0.5, img);
-        }).toThrowError();
-
-        expect(() => {
-            new ProductItem("name", 1, 0, 0, img);
-        }).not.toThrowError();
-
-        expect(() => {
-            new ProductItem("name", 1, 1, 1, img);
-        }).not.toThrowError();
+    it("Only accepts non-negative integer remaining items in stock", () => {
+        const tests: Test[] = [
+            { mod: { stock: -0.5 }, toThrowError: true },
+            { mod: { stock: -1 }, toThrowError: true },
+            { mod: { stock: 0.5 }, toThrowError: true },
+            { mod: { stock: 0 }, toThrowError: false },
+            { mod: { stock: 1 }, toThrowError: false },
+        ];
+        runModificationTests(testItem, tests);
     });
 
-    it("Cannot set a quantity initially above the number of remaining items", () => {
-        expect(() => {
-            new ProductItem("name", 1, 6, 5, img);
-        }).toThrowError();
-
-        expect(() => {
-            new ProductItem("name", 1, 5, 5, img);
-        }).not.toThrowError();
-
-        expect(() => {
-            new ProductItem("name", 1, 4, 5, img);
-        }).not.toThrowError();
+    it("Cannot set a quantity initially above the number of remaining items in stock", () => {
+        const tests: Test[] = [
+            { mod: { stock: 1, quantity: 2 }, toThrowError: true },
+            { mod: { stock: 1, quantity: 1 }, toThrowError: false },
+            { mod: { stock: 1, quantity: 0 }, toThrowError: false },
+        ];
+        runModificationTests(testItem, tests);
     });
 
-    it("Clamps quantities between [0, remainingItems]", () => {
-        function updateQuantity(
-            initQuantity: number,
-            newQuantity: number,
-            remainingItems: number
-        ) {
-            const item = new ProductItem(
-                "name",
-                1,
-                initQuantity,
-                remainingItems,
-                img
-            );
-            item.updateQuantity(newQuantity);
-            return item.quantity;
-        }
-
-        expect(updateQuantity(3, 6, 5)).toBe(5);
-        expect(updateQuantity(3, 5, 5)).toBe(5);
-        expect(updateQuantity(3, 4, 5)).toBe(4);
-        expect(updateQuantity(3, 0, 5)).toBe(0);
-        expect(updateQuantity(3, -1, 5)).toBe(0);
-
-        expect(() => {
-            updateQuantity(3, 0.5, 5);
-        }).toThrowError();
-    });
-
-    it("Accurately computes and formats prices", () => {
-        const item = new ProductItem("name", 1235, 5, 10, img);
-        expect(item.price()).toBe(1235);
-        expect(item.price(true)).toBe("$12.35");
-
-        item.cents = 0;
-        expect(item.price(true)).toBe("$0.00");
-
-        item.cents = 4;
-        expect(item.price(true)).toBe("$0.04");
-    });
-
-    it("Accurately computes and formats totals", () => {
-        const item = new ProductItem("name", 1235, 5, 10, img);
-        expect(item.total()).toBe(6175);
-        expect(item.total(true)).toBe("$61.75");
-
-        item.cents = 0;
-        expect(item.total(true)).toBe("$0.00");
-
-        item.cents = 4;
-        expect(item.total(true)).toBe("$0.20");
+    it("Cannot set an invalid URL", () => {
+        const tests: Test[] = [
+            { mod: { image: "" }, toThrowError: true },
+            { mod: { image: "http" }, toThrowError: true },
+            { mod: { image: "http://test.exe" }, toThrowError: true },
+            { mod: { image: "https://test.exe" }, toThrowError: true },
+            { mod: { image: "png" }, toThrowError: true },
+            { mod: { image: ".png" }, toThrowError: true },
+            { mod: { image: "/png" }, toThrowError: true },
+            { mod: { image: "test.png" }, toThrowError: true },
+            { mod: { image: "/test.png" }, toThrowError: true },
+            { mod: { image: "https://test.png" }, toThrowError: false },
+            { mod: { image: "https://www.test.png" }, toThrowError: false },
+            { mod: { image: "http://test.png" }, toThrowError: false },
+        ];
+        runModificationTests(testItem, tests);
     });
 });

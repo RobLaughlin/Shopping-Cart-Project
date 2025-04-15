@@ -1,36 +1,32 @@
 import { useState } from "react";
-
-import styles from "./ProductList.module.css";
-import { ProductItem } from "../../Schemas/ProductItem.schema";
+import { cloneDeep } from "lodash-es";
+import {
+    ProductItemWithStock,
+    PRODUCT_ITEM_WITH_STOCK_SCHEMA,
+} from "../../Schemas/ProductItem.schema";
 
 import Button from "@mui/material/Button";
+import styles from "./ProductList.module.css";
 
 type ProductListProps = {
-    items?: ProductItem[];
+    items?: ProductItemWithStock[];
 };
 
 function ProductList({ items = [] }: ProductListProps) {
-    const [ProductItems, setProductItems] = useState([
-        ...items.map((itm) => {
-            return new ProductItem(
-                itm.name,
-                itm.price(false) as number,
-                itm.quantity,
-                itm.remainingItems,
-                itm.imgURL,
-                itm.id
-            );
-        }),
-    ]);
+    const [productItems, setProductItems] = useState(
+        cloneDeep(
+            items.filter(
+                (item) => PRODUCT_ITEM_WITH_STOCK_SCHEMA.safeParse(item).success
+            )
+        )
+    );
 
-    function renderItems(items: ProductItem[]) {
+    function renderItems(items: ProductItemWithStock[]) {
         return (
             <>
                 <ul className={styles["no-list-style"]}>
                     {items.map((item) => {
-                        const { id, name, remainingItems, imgURL } = item;
-                        const price = item.price(true);
-                        const total = item.total(true);
+                        const { id, title, stock, image, price } = item;
 
                         return (
                             <li
@@ -40,24 +36,24 @@ function ProductList({ items = [] }: ProductListProps) {
                             >
                                 <div className={styles.card}>
                                     <img
-                                        src={imgURL.href}
+                                        src={image}
                                         alt="Item thumbnail"
                                         className={styles.thumbnail}
                                     />
                                     <hr />
                                     <div className={styles.infoContainer}>
                                         <h1 className={styles.itemName}>
-                                            {name}
+                                            {title}
                                         </h1>
                                         <hr />
                                         <p className={styles.price}>
-                                            Price: <b>{price}</b>
+                                            Price: <b>{`$${price}`}</b>
                                         </p>
                                         <p className={styles.itemsRemaining}>
-                                            {remainingItems !== 0 ? (
+                                            {stock !== 0 ? (
                                                 <>
-                                                    Items remaining:{" "}
-                                                    <b>{item.remainingItems}</b>
+                                                    Left in stock:{" "}
+                                                    <b>{item.stock}</b>
                                                 </>
                                             ) : (
                                                 <b
@@ -100,8 +96,8 @@ function ProductList({ items = [] }: ProductListProps) {
 
     return (
         <div className={styles.products}>
-            {ProductItems.length > 0 ? (
-                renderItems(ProductItems)
+            {productItems.length > 0 ? (
+                renderItems(productItems)
             ) : (
                 <p>No products found...</p>
             )}

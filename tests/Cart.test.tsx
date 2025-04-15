@@ -1,55 +1,84 @@
 import { describe, it, expect } from "vitest";
 import { within } from "@testing-library/react";
 import { render, screen } from "@testing-library/react";
-import { ProductItem } from "../src/Schemas/ProductItem.schema";
+import { ProductItemWithStock } from "../src/Schemas/ProductItem.schema";
 import userEvent from "@testing-library/user-event";
+import { cloneDeep } from "lodash-es";
 import Cart from "../src/components/Cart/Cart.component";
 import React from "react";
 
 describe("Cart component", () => {
-    const ProductItems = [
-        new ProductItem(
-            "Fjallraven - Foldsack No. 1 Backpack, Fits 15 Laptops",
-            10995,
-            3,
-            5,
-            new URL("https://fakestoreapi.com/img/81fPKd-2AYL._AC_SL1500_.jpg"),
-            1
-        ),
-        new ProductItem(
-            "Mens Casual Premium Slim Fit T-Shirts",
-            2230,
-            6,
-            100,
-            new URL(
-                "https://fakestoreapi.com/img/71-3HjGNDUL._AC_SY879._SX._UX._SY._UY_.jpg"
-            ),
-            2
-        ),
-        new ProductItem(
-            "Silicon Power 256GB SSD 3D NAND A55 SLC Cache Performance Boost SATA III 2.5",
-            10900,
-            1,
-            20,
-            new URL("https://fakestoreapi.com/img/71kWymZ+c+L._AC_SX679_.jpg"),
-            11
-        ),
-        new ProductItem(
-            "DANVOUY Womens T Shirt Casual Cotton Short",
-            1299,
-            0,
-            0,
-            new URL("https://fakestoreapi.com/img/61pHAEJ4NML._AC_UX679_.jpg"),
-            20
-        ),
+    const testItems = [
+        {
+            id: 1,
+            title: "Fjallraven - Foldsack No. 1 Backpack, Fits 15 Laptops",
+            price: 109.95,
+            description:
+                "Your perfect pack for everyday use and walks in the forest. Stash your laptop (up to 15 inches) in the padded sleeve, your everyday",
+            category: "men's clothing",
+            image: "https://fakestoreapi.com/img/81fPKd-2AYL._AC_SL1500_.jpg",
+            rating: {
+                rate: 3.9,
+                count: 120,
+            },
+            stock: 10,
+            quantity: 3,
+        },
+        {
+            id: 3,
+            title: "Mens Cotton Jacket",
+            price: 55.99,
+            description:
+                "great outerwear jackets for Spring/Autumn/Winter, suitable for many occasions, such as working, hiking, camping, mountain/rock climbing, cycling, traveling or other outdoors. Good gift choice for you or your family member. A warm hearted love to Father, husband or son in this thanksgiving or Christmas Day.",
+            category: "men's clothing",
+            image: "https://fakestoreapi.com/img/71li-ujtlUL._AC_UX679_.jpg",
+            rating: {
+                rate: 4.7,
+                count: 500,
+            },
+            stock: 54,
+            quantity: 2,
+        },
+        {
+            id: 7,
+            title: "White Gold Plated Princess",
+            price: 9.99,
+            description:
+                "Classic Created Wedding Engagement Solitaire Diamond Promise Ring for Her. Gifts to spoil your love more for Engagement, Wedding, Anniversary, Valentine's Day...",
+            category: "jewelery",
+            image: "https://fakestoreapi.com/img/71YAIFU48IL._AC_UL640_QL65_ML3_.jpg",
+            rating: {
+                rate: 3,
+                count: 400,
+            },
+            stock: 3,
+            quantity: 3,
+        },
+        {
+            id: 20,
+            title: "DANVOUY Womens T Shirt Casual Cotton Short",
+            price: 12.99,
+            description:
+                "95%Cotton,5%Spandex, Features: Casual, Short Sleeve, Letter Print,V-Neck,Fashion Tees, The fabric is soft and has some stretch., Occasion: Casual/Office/Beach/School/Home/Street. Season: Spring,Summer,Autumn,Winter.",
+            category: "women's clothing",
+            image: "https://fakestoreapi.com/img/61pHAEJ4NML._AC_UX679_.jpg",
+            rating: {
+                rate: 3.6,
+                count: 145,
+            },
+            stock: 0,
+            quantity: 0,
+        },
     ];
 
     interface ItemData {
         id: string | number;
-        quantity: HTMLElement | null;
-        cost: HTMLElement[];
-        totalCost: HTMLElement[];
-        itemsRemaining: HTMLElement | null;
+        quantityElem: HTMLElement | null;
+        costElems: HTMLElement[];
+        totalCostElems: HTMLElement[];
+        stockElem: HTMLElement | null;
+        increaseQuantityElem: HTMLElement | null;
+        decreaseQuantityElem: HTMLElement | null;
     }
 
     interface CartQueries {
@@ -58,24 +87,12 @@ describe("Cart component", () => {
         itemData: (ItemData | null)[];
     }
 
-    function renderCart(items: ProductItem[], rerender = true): CartQueries {
+    function renderCart(
+        items: ProductItemWithStock[],
+        rerender = true
+    ): CartQueries {
         if (rerender) {
-            render(
-                <Cart
-                    items={[
-                        ...items.map((itm) => {
-                            return new ProductItem(
-                                itm.name,
-                                itm.price(false) as number,
-                                itm.quantity,
-                                itm.remainingItems,
-                                itm.imgURL,
-                                itm.id
-                            );
-                        }),
-                    ]}
-                />
-            );
+            render(<Cart items={items} />);
         }
 
         const queryEmptyText = (): HTMLElement | null => {
@@ -83,12 +100,12 @@ describe("Cart component", () => {
         };
 
         const queryFormattedTotalCost = (
-            items: ProductItem[]
+            items: ProductItemWithStock[]
         ): HTMLElement[] => {
             const cost = items.reduce((acc, item) => {
-                return acc + (item.total(false) as number);
+                return acc + item.price * item.quantity;
             }, 0);
-            const costStr = (cost / 100).toLocaleString("en-US", {
+            const costStr = cost.toLocaleString("en-US", {
                 style: "currency",
                 currency: "USD",
             });
@@ -96,20 +113,30 @@ describe("Cart component", () => {
             return screen.queryAllByText(costStr);
         };
 
-        const queryItems = (items: ProductItem[]): (ItemData | null)[] => {
+        const queryItems = (
+            items: ProductItemWithStock[]
+        ): (ItemData | null)[] => {
             const itemData = items.map((item) => {
                 const data: ItemData = {
                     id: item.id,
-                    quantity: null,
-                    cost: [],
-                    totalCost: [],
-                    itemsRemaining: null,
+                    quantityElem: null,
+                    costElems: [],
+                    totalCostElems: [],
+                    stockElem: null,
+                    increaseQuantityElem: null,
+                    decreaseQuantityElem: null,
                 };
 
                 const itemElem = screen.queryByTestId(item.id);
                 if (itemElem === null) {
                     return null;
                 }
+
+                // Grab quantity buttons
+                data.increaseQuantityElem =
+                    within(itemElem).queryByTestId("IncreaseQuantity");
+                data.decreaseQuantityElem =
+                    within(itemElem).queryByTestId("DecreaseQuantity");
 
                 // Update quantity if possible
                 const quantityLabel = within(itemElem).queryByText(/quantity/i);
@@ -118,26 +145,34 @@ describe("Cart component", () => {
                         item.quantity.toString()
                     );
 
-                    data.quantity = quantity;
+                    data.quantityElem = quantity;
                 }
 
                 // Query cost and totalCost if possible
-                data.cost = within(itemElem).queryAllByText(item.price(true));
-                data.totalCost = within(itemElem).queryAllByText(
-                    item.total(true)
+                data.costElems = within(itemElem).queryAllByText(
+                    item.price.toLocaleString("en-US", {
+                        style: "currency",
+                        currency: "USD",
+                    })
+                );
+                data.totalCostElems = within(itemElem).queryAllByText(
+                    (item.price * item.quantity).toLocaleString("en-US", {
+                        style: "currency",
+                        currency: "USD",
+                    })
                 );
 
                 // Query remaining items
-                if (item.remainingItems === 0) {
-                    data.itemsRemaining =
+                if (item.stock === 0) {
+                    data.stockElem =
                         within(itemElem).queryByText(/out of stock/i);
                 } else {
-                    const itemsRemaining =
+                    const stock =
                         within(itemElem).queryByText(/items remaining/i);
-                    if (itemsRemaining !== null) {
-                        data.itemsRemaining = within(
-                            itemsRemaining
-                        ).queryByText(item.remainingItems.toString());
+                    if (stock !== null) {
+                        data.stockElem = within(stock).queryByText(
+                            item.stock.toString()
+                        );
                     }
                 }
 
@@ -162,7 +197,7 @@ describe("Cart component", () => {
     });
 
     it("Renders the quantity, formatted price, and total cost (price * quantity) of each item", () => {
-        const { itemData } = renderCart(ProductItems);
+        const { itemData } = renderCart(testItems);
 
         itemData.forEach((item) => {
             expect(item).not.toBe(null);
@@ -170,93 +205,102 @@ describe("Cart component", () => {
                 return;
             }
 
-            const { quantity, cost, totalCost } = item;
-            expect(quantity).not.toBe(null);
-            expect(cost).not.toStrictEqual([]);
-            expect(totalCost).not.toStrictEqual([]);
+            const { quantityElem, costElems, totalCostElems } = item;
+            expect(quantityElem).not.toBe(null);
+            expect(costElems).not.toStrictEqual([]);
+            expect(totalCostElems).not.toStrictEqual([]);
         });
     });
 
     it("Renders the formatted total accumulated cost of all items", () => {
-        const { formattedTotalCost } = renderCart(ProductItems);
+        const { formattedTotalCost } = renderCart(testItems);
         expect(formattedTotalCost).not.toStrictEqual([]);
     });
 
     it("Renders the correct quantities, costs, and total costs after user increases or decreases the quantity", async () => {
+        function getItemDataFromScreen(
+            items: ProductItemWithStock[],
+            id: number,
+            rerender: boolean
+        ): ItemData | null {
+            const { itemData } = renderCart(items, rerender);
+
+            const item = itemData.find(
+                (item) => item !== null && id === item.id
+            );
+            if (item === null || item === undefined) {
+                return null;
+            }
+
+            return item;
+        }
+
         const user = userEvent.setup();
+        const items = cloneDeep(testItems);
 
-        const prevCart = renderCart(ProductItems, true);
+        renderCart(items);
+        for (let i = 0; i < items.length; i++) {
+            const item = items[i];
+            const prevItemData = getItemDataFromScreen(items, item.id, false);
 
-        for (let i = 0; i < ProductItems.length; i++) {
-            const item = ProductItems[i];
-            const itemElem = screen.queryByTestId(item.id.toString());
-            expect(itemElem).not.toBe(null);
-            if (itemElem === null) {
+            expect(prevItemData).not.toBe(null);
+            if (prevItemData === null) {
                 break;
             }
 
-            function passExpectations() {
-                const { itemData, formattedTotalCost } = renderCart(
-                    ProductItems,
-                    false
-                );
+            const { quantityElem, increaseQuantityElem, decreaseQuantityElem } =
+                prevItemData;
 
-                const thisItem = itemData.find(
-                    (curItem) => curItem?.id === item.id
-                );
-
-                expect(thisItem).not.toBe(null);
-                expect(thisItem).not.toBe(undefined);
-                if (thisItem !== null && thisItem !== undefined) {
-                    const { quantity, cost, totalCost } = thisItem;
-                    expect(quantity).not.toBe(null);
-                    expect(cost).not.toStrictEqual([]);
-                    expect(totalCost).not.toStrictEqual([]);
-                }
-
-                expect(formattedTotalCost).not.toStrictEqual([]);
-            }
-
-            const increaseBtn =
-                within(itemElem).queryByTestId("IncreaseQuantity");
-            expect(increaseBtn).not.toBe(null);
-            if (increaseBtn === null) {
+            expect(quantityElem).not.toBe(null);
+            expect(increaseQuantityElem).not.toBe(null);
+            expect(decreaseQuantityElem).not.toBe(null);
+            if (
+                quantityElem === null ||
+                increaseQuantityElem === null ||
+                decreaseQuantityElem === null
+            ) {
                 break;
             }
 
-            await user.click(increaseBtn);
-            item.updateQuantity(item.quantity + 1);
-            passExpectations();
+            await user.click(increaseQuantityElem);
 
-            const decreaseBtn =
-                within(itemElem).queryByTestId("DecreaseQuantity");
-            expect(decreaseBtn).not.toBe(null);
-            if (decreaseBtn === null) {
-                break;
-            }
+            const increaseItems = cloneDeep(items);
+            increaseItems[i].quantity++;
 
-            await user.click(decreaseBtn);
-            item.updateQuantity(item.quantity - 1);
-            passExpectations();
+            const increasedItemData = getItemDataFromScreen(
+                increaseItems,
+                item.id,
+                false
+            );
+            expect(increasedItemData).not.toBe(null);
+
+            const decreaseItems = cloneDeep(increaseItems);
+            decreaseItems[i].quantity--;
+            const decreasedItemData = getItemDataFromScreen(
+                decreaseItems,
+                item.id,
+                false
+            );
+            expect(decreasedItemData).not.toBe(null);
         }
     });
 
     it("Shows how many items are remaining and out of stock if that number is 0", () => {
-        const { itemData } = renderCart(ProductItems);
+        const { itemData } = renderCart(testItems);
         itemData.forEach((item) => {
             expect(item).not.toBe(null);
             if (item === null) {
                 return;
             }
 
-            const { itemsRemaining } = item;
-            expect(itemsRemaining).not.toBe(null);
+            const { stockElem } = item;
+            expect(stockElem).not.toBe(null);
         });
     });
 
     it("Removes the item when the remove item button is clicked", async () => {
         const user = userEvent.setup();
-        const { itemData } = renderCart(ProductItems);
+        const { itemData } = renderCart(testItems);
 
         for (let i = 0; i < itemData.length; i++) {
             const item = itemData[i];

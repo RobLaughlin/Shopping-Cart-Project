@@ -1,7 +1,9 @@
 import { useState } from "react";
-
-import styles from "./Cart.module.css";
-import { ProductItem } from "../../Schemas/ProductItem.schema";
+import { cloneDeep } from "lodash-es";
+import {
+    ProductItemWithStock,
+    PRODUCT_ITEM_WITH_STOCK_SCHEMA,
+} from "../../Schemas/ProductItem.schema";
 
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
@@ -9,81 +11,56 @@ import CloseIcon from "@mui/icons-material/Close";
 import IconButton from "@mui/material/IconButton";
 import Button from "@mui/material/Button";
 
+import styles from "./Cart.module.css";
+
 type CartProps = {
-    items?: ProductItem[];
+    items?: ProductItemWithStock[];
 };
 
 function Cart({ items = [] }: CartProps) {
-    const [ProductItems, setProductItems] = useState([
-        ...items.map((itm) => {
-            return new ProductItem(
-                itm.name,
-                itm.price(false) as number,
-                itm.quantity,
-                itm.remainingItems,
-                itm.imgURL,
-                itm.id
-            );
-        }),
-    ]);
+    const [productItems, setProductItems] = useState(
+        cloneDeep(
+            items.filter(
+                (item) => PRODUCT_ITEM_WITH_STOCK_SCHEMA.safeParse(item).success
+            )
+        )
+    );
 
     function updateQuantity(key: number | string, quantity: number): void {
-        const item = ProductItems.find((item) => item.id === key);
+        const item = productItems.find((item) => item.id === key);
         if (item === null || item === undefined) {
             return;
         }
 
-        item.updateQuantity(quantity);
-        setProductItems([
-            ...ProductItems.map((itm) => {
-                return new ProductItem(
-                    itm.name,
-                    itm.price(false) as number,
-                    itm.quantity,
-                    itm.remainingItems,
-                    itm.imgURL,
-                    itm.id
-                );
-            }),
-        ]);
+        item.quantity = Math.max(0, Math.min(item.stock, quantity));
+        setProductItems(cloneDeep(productItems));
     }
 
     function removeItem(key: number | string): void {
-        setProductItems([
-            ...ProductItems.filter((item) => item.id !== key).map((itm) => {
-                return new ProductItem(
-                    itm.name,
-                    itm.price(false) as number,
-                    itm.quantity,
-                    itm.remainingItems,
-                    itm.imgURL,
-                    itm.id
-                );
-            }),
-        ]);
+        setProductItems(
+            cloneDeep(productItems.filter((item) => item.id !== key))
+        );
     }
 
-    function calculateTotalCost(items: ProductItem[]) {
-        const totals = items.map((item) => item.total(false) as number);
-        const cost = totals.reduce((acc, total) => {
+    function calculateTotalCost(items: ProductItemWithStock[]) {
+        const totals = items.map((item) => item.price * item.quantity);
+        const total = totals.reduce((acc, total) => {
             return acc + total;
         }, 0);
 
-        return (cost / 100).toLocaleString("en-US", {
+        return total.toLocaleString("en-US", {
             style: "currency",
             currency: "USD",
         });
     }
 
-    function renderItems(items: ProductItem[]) {
+    function renderItems(items: ProductItemWithStock[]) {
         return (
             <>
                 <ul className={styles["no-list-style"]}>
                     {items.map((item) => {
-                        const { id, name, quantity, remainingItems, imgURL } =
+                        const { id, title, quantity, stock, image, price } =
                             item;
-                        const price = item.price(true);
-                        const total = item.total(true);
 
                         return (
                             <li
@@ -93,18 +70,24 @@ function Cart({ items = [] }: CartProps) {
                             >
                                 <div className={styles.card}>
                                     <img
-                                        src={imgURL.href}
+                                        src={image}
                                         alt="Item thumbnail"
                                         className={styles.thumbnail}
                                     />
                                     <hr />
                                     <div className={styles.infoContainer}>
                                         <h1 className={styles.itemName}>
-                                            {name}
+                                            {title}
                                         </h1>
                                         <hr />
                                         <p className={styles.price}>
-                                            Price: <b>{price}</b>
+                                            Price:{" "}
+                                            <b>
+                                                {price.toLocaleString("en-US", {
+                                                    style: "currency",
+                                                    currency: "USD",
+                                                })}
+                                            </b>
                                         </p>
                                         <p className={styles.quantity}>
                                             Quantity: <b>{quantity}</b>
@@ -152,10 +135,10 @@ function Cart({ items = [] }: CartProps) {
                                         </div>
 
                                         <p className={styles.itemsRemaining}>
-                                            {remainingItems !== 0 ? (
+                                            {stock !== 0 ? (
                                                 <>
                                                     Items remaining:{" "}
-                                                    <b>{item.remainingItems}</b>
+                                                    <b>{stock}</b>
                                                 </>
                                             ) : (
                                                 <b
@@ -169,7 +152,16 @@ function Cart({ items = [] }: CartProps) {
                                         </p>
                                         <div className={styles.itemFooter}>
                                             <p className={styles.totalPrice}>
-                                                Total Price: <b>{total}</b>
+                                                Total Price:{" "}
+                                                <b>
+                                                    {(
+                                                        item.price *
+                                                        item.quantity
+                                                    ).toLocaleString("en-US", {
+                                                        style: "currency",
+                                                        currency: "USD",
+                                                    })}
+                                                </b>
                                             </p>
                                             <IconButton
                                                 data-testid="RemoveItem"
@@ -208,8 +200,8 @@ function Cart({ items = [] }: CartProps) {
 
     return (
         <div className={styles.cart}>
-            {ProductItems.length > 0 ? (
-                renderItems(ProductItems)
+            {productItems.length > 0 ? (
+                renderItems(productItems)
             ) : (
                 <p>Shopping cart is empty</p>
             )}

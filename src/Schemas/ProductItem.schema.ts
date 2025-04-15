@@ -1,38 +1,14 @@
 import { z } from "zod";
+import { deepCopy } from "lodash-es";
 
 const VALID_IMAGE_FORMATS = [".png", ".jpg", ".jpeg", ".gif"];
-
-class ProductItem {
-    id: string | number;
-    name: string;
-    cents: number;
-    remainingItems: number;
-    imgURL: URL;
-
-    #quantity: number;
-
-    /**
-     * @constructor
-     * @param name The name of the item
-     * @param priceCents The price of the item in cents
-     * @param quantity How many items purchased
-     * @param remainingItems How many of these items are left in the store
-     * @param imgURL The image URL of the item
-     * @param id The unique ID of the item
-     */
-    constructor(
-        name: string,
-        priceCents: number,
-        quantity: number,
-        remainingItems: number,
-        imgURL: URL,
-        id: string | number = crypto.randomUUID()
-    ) {
-        z.number().int().nonnegative().parse(priceCents);
-        z.number().int().nonnegative().parse(remainingItems);
-        z.number().int().nonnegative().lte(remainingItems).parse(quantity);
-
-        z.string()
+const PRODUCT_ITEM_SCHEMA = z
+    .object({
+        id: z.string().or(z.number()),
+        title: z.string(),
+        price: z.number().nonnegative(),
+        image: z
+            .string()
             .url()
             .refine(
                 (url) => {
@@ -45,65 +21,27 @@ class ProductItem {
                 {
                     message: "Invalid image format",
                 }
-            )
-            .parse(imgURL.href);
+            ),
+        category: z.string(),
+        description: z.string(),
+        rating: z
+            .object({
+                rate: z.number().nonnegative().lte(5).nullable(),
+                count: z.number().int().nonnegative().nullable(),
+            })
+            .required(),
+    })
+    .required();
 
-        this.name = name;
-        this.cents = priceCents;
-        this.remainingItems = remainingItems;
-        this.imgURL = imgURL;
-        this.id = id;
+const PRODUCT_ITEM_WITH_STOCK_SCHEMA = PRODUCT_ITEM_SCHEMA.extend({
+    stock: z.number().int().nonnegative(),
+    quantity: z.number().int().nonnegative(),
+}).refine((item) => {
+    return item.quantity <= item.stock;
+});
 
-        this.#quantity = Math.min(quantity, remainingItems);
-    }
+type ProductItem = z.infer<typeof PRODUCT_ITEM_SCHEMA>;
+type ProductItemWithStock = z.infer<typeof PRODUCT_ITEM_WITH_STOCK_SCHEMA>;
 
-    get quantity() {
-        return this.#quantity;
-    }
-
-    /**
-     * Calculates the price of the single cart item
-     * @param toString Whether to return the item price as an integer in cents or a formatted USD currency string
-     * @returns The item price in cents or a formatted string
-     */
-    price(toString: boolean = false): number | string {
-        if (!toString) {
-            return this.cents;
-        }
-
-        return (Number(this.cents) / 100).toLocaleString("en-US", {
-            style: "currency",
-            currency: "USD",
-        });
-    }
-
-    /**
-     * Calculates the total price of the cart item
-     * @param toString Whether to return the total price as an integer in cents or a formatted USD currency string
-     * @returns The total price in cents or a formatted string
-     */
-    total(toString: boolean = false): number | string {
-        const totalPrice = this.quantity * (this.price(false) as number);
-        if (!toString) {
-            return totalPrice;
-        }
-
-        return (totalPrice / 100).toLocaleString("en-US", {
-            style: "currency",
-            currency: "USD",
-        });
-    }
-
-    /**
-     * Updates the quantity of this specific item to purchase.
-     * Cannot exceed the remaining number of items.
-     *
-     * @param quantity The new quantity of the item in the cart
-     */
-    updateQuantity(quantity: number): void {
-        z.number().int().parse(quantity);
-        this.#quantity = Math.max(0, Math.min(quantity, this.remainingItems));
-    }
-}
-
-export { ProductItem };
+export type { ProductItem, ProductItemWithStock };
+export { PRODUCT_ITEM_SCHEMA, PRODUCT_ITEM_WITH_STOCK_SCHEMA };
