@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { deepCopy } from "lodash-es";
 
 const VALID_IMAGE_FORMATS = [".png", ".jpg", ".jpeg", ".gif"];
 const PRODUCT_ITEM_SCHEMA = z

@@ -65,7 +65,7 @@ function Cart({ items = [] }: CartProps) {
                         return (
                             <li
                                 key={id}
-                                className={styles.ProductItem}
+                                className={styles.cartItem}
                                 data-testid={id}
                             >
                                 <div className={styles.card}>
