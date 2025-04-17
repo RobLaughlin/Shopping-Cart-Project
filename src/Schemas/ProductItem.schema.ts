@@ -25,8 +25,8 @@ const PRODUCT_ITEM_SCHEMA = z
         description: z.string(),
         rating: z
             .object({
-                rate: z.number().nonnegative().lte(5).nullable(),
-                count: z.number().int().nonnegative().nullable(),
+                rate: z.number().nonnegative().lte(5),
+                count: z.number().int().nonnegative(),
             })
             .required(),
     })

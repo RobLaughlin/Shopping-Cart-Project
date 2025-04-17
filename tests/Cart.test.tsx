@@ -6,6 +6,7 @@ import userEvent from "@testing-library/user-event";
 import { cloneDeep } from "lodash-es";
 import Cart from "../src/components/Cart/Cart.component";
 import React from "react";
+import { date } from "zod";
 
 describe("Cart component", () => {
     const testItems = [
@@ -79,6 +80,10 @@ describe("Cart component", () => {
         stockElem: HTMLElement | null;
         increaseQuantityElem: HTMLElement | null;
         decreaseQuantityElem: HTMLElement | null;
+        ratings: {
+            rateElem: HTMLElement | null;
+            countElem: HTMLElement | null;
+        };
     }
 
     interface CartQueries {
@@ -96,7 +101,7 @@ describe("Cart component", () => {
         }
 
         const queryEmptyText = (): HTMLElement | null => {
-            return screen.queryByText(/empty/i);
+            return screen.queryByText(/cart is empty/i);
         };
 
         const queryFormattedTotalCost = (
@@ -125,6 +130,10 @@ describe("Cart component", () => {
                     stockElem: null,
                     increaseQuantityElem: null,
                     decreaseQuantityElem: null,
+                    ratings: {
+                        rateElem: null,
+                        countElem: null,
+                    },
                 };
 
                 const itemElem = screen.queryByTestId(item.id);
@@ -167,8 +176,7 @@ describe("Cart component", () => {
                     data.stockElem =
                         within(itemElem).queryByText(/out of stock/i);
                 } else {
-                    const stock =
-                        within(itemElem).queryByText(/items remaining/i);
+                    const stock = within(itemElem).queryByText(/in stock/i);
                     if (stock !== null) {
                         data.stockElem = within(stock).queryByText(
                             item.stock.toString()
@@ -176,6 +184,16 @@ describe("Cart component", () => {
                     }
                 }
 
+                data.ratings.rateElem =
+                    within(itemElem).queryByTestId("ratings");
+
+                const ratingsContainer =
+                    within(itemElem).queryByTestId("ratingsContainer");
+                if (ratingsContainer !== null) {
+                    data.ratings.countElem = within(
+                        ratingsContainer
+                    ).queryByText(item.rating.count);
+                }
                 return data;
             });
 
@@ -326,5 +344,21 @@ describe("Cart component", () => {
             // Verify that the item was removed
             expect(screen.queryByTestId(item.id.toString())).toBe(null);
         }
+    });
+
+    it("Displays the ratings and how many reviews there are, rounded to the nearest 0.5", () => {
+        const { itemData } = renderCart(testItems);
+        itemData.forEach((item) => {
+            expect(item).not.toBe(null);
+            if (item === null) {
+                return;
+            }
+
+            const { ratings } = item;
+            const { rateElem, countElem } = ratings;
+
+            expect(rateElem).not.toBe(null);
+            expect(countElem).not.toBe(null);
+        });
     });
 });

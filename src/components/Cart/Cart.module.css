@@ -13,6 +13,22 @@
     margin-bottom: 16px;
 }
 
+.ratingContainer {
+    margin-top: 8px;
+    display: flex;
+    text-align: center;
+    align-items: center;
+}
+
+.rating {
+    margin-right: 8px;
+}
+
+.ratingCount {
+    font-size: 18px;
+    text-align: center;
+}
+
 .no-list-style {
     list-style-type: none;
 }
@@ -46,7 +62,7 @@
 }
 
 .price {
-    margin-top: 16px;
+    margin-top: 8px;
 }
 
 .price,

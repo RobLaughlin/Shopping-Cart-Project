@@ -10,6 +10,7 @@ import RemoveIcon from "@mui/icons-material/Remove";
 import CloseIcon from "@mui/icons-material/Close";
 import IconButton from "@mui/material/IconButton";
 import Button from "@mui/material/Button";
+import Rating from "@mui/material/Rating";
 
 import styles from "./Cart.module.css";
 
@@ -59,8 +60,15 @@ function Cart({ items = [] }: CartProps) {
             <>
                 <ul className={styles["no-list-style"]}>
                     {items.map((item) => {
-                        const { id, title, quantity, stock, image, price } =
-                            item;
+                        const {
+                            id,
+                            title,
+                            quantity,
+                            stock,
+                            image,
+                            price,
+                            rating,
+                        } = item;
 
                         return (
                             <li
@@ -80,6 +88,22 @@ function Cart({ items = [] }: CartProps) {
                                             {title}
                                         </h1>
                                         <hr />
+                                        <div
+                                            className={styles.ratingContainer}
+                                            data-testid="ratingsContainer"
+                                        >
+                                            <Rating
+                                                readOnly
+                                                precision={0.5}
+                                                value={rating.rate}
+                                                className={styles.rating}
+                                                size="large"
+                                                data-testid="ratings"
+                                            />
+                                            <p className={styles.ratingCount}>
+                                                (<i>{rating.count}</i>)
+                                            </p>
+                                        </div>
                                         <p className={styles.price}>
                                             Price:{" "}
                                             <b>
@@ -133,12 +157,10 @@ function Cart({ items = [] }: CartProps) {
                                                 <RemoveIcon />
                                             </IconButton>
                                         </div>
-
                                         <p className={styles.itemsRemaining}>
                                             {stock !== 0 ? (
                                                 <>
-                                                    Items remaining:{" "}
-                                                    <b>{stock}</b>
+                                                    <b>{stock} </b>Left in stock
                                                 </>
                                             ) : (
                                                 <b
