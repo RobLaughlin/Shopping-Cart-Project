@@ -4,23 +4,10 @@ import {
     PRODUCT_ITEM_WITH_STOCK_SCHEMA,
 } from "../src/Schemas/ProductItem.schema";
 import { cloneDeep } from "lodash-es";
+import { TEST_PRODUCT_ITEMS } from "./Testdata";
 
 describe("ProductItem data structure", () => {
-    const testItem: ProductItemWithStock = {
-        id: 1,
-        title: "Fjallraven - Foldsack No. 1 Backpack, Fits 15 Laptops",
-        price: 109.95,
-        description:
-            "Your perfect pack for everyday use and walks in the forest. Stash your laptop (up to 15 inches) in the padded sleeve, your everyday",
-        category: "men's clothing",
-        image: "https://fakestoreapi.com/img/81fPKd-2AYL._AC_SL1500_.jpg",
-        rating: {
-            rate: 3.9,
-            count: 120,
-        },
-        stock: 10,
-        quantity: 0,
-    };
+    const testItem: ProductItemWithStock = cloneDeep(TEST_PRODUCT_ITEMS)[0];
 
     type Test = {
         mod: object;
@@ -71,11 +58,11 @@ describe("ProductItem data structure", () => {
 
     it("Only accepts non-negative integer remaining items in stock", () => {
         const tests: Test[] = [
-            { mod: { stock: -0.5 }, toThrowError: true },
-            { mod: { stock: -1 }, toThrowError: true },
-            { mod: { stock: 0.5 }, toThrowError: true },
-            { mod: { stock: 0 }, toThrowError: false },
-            { mod: { stock: 1 }, toThrowError: false },
+            { mod: { stock: -0.5, quantity: 0 }, toThrowError: true },
+            { mod: { stock: -1, quantity: 0 }, toThrowError: true },
+            { mod: { stock: 0.5, quantity: 0 }, toThrowError: true },
+            { mod: { stock: 0, quantity: 0 }, toThrowError: false },
+            { mod: { stock: 1, quantity: 0 }, toThrowError: false },
         ];
         runModificationTests(testItem, tests);
     });
