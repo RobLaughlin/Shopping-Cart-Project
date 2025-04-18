@@ -59,13 +59,29 @@
     font-size: 18px;
 }
 
+.ratingContainer {
+    margin-top: 8px;
+    display: flex;
+    text-align: center;
+    align-items: center;
+}
+
+.rating {
+    margin-right: 8px;
+}
+
+.ratingCount {
+    font-size: 18px;
+    text-align: center;
+}
+
 .itemName {
     font-size: min(4vw, 36px);
     margin-bottom: 16px;
 }
 
 .price {
-    margin-top: 16px;
+    margin-top: 8px;
 }
 
 .price,

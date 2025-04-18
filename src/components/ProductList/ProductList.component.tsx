@@ -6,6 +6,7 @@ import {
 } from "../../Schemas/ProductItem.schema";
 
 import Button from "@mui/material/Button";
+import Rating from "@mui/material/Rating";
 import styles from "./ProductList.module.css";
 
 type ProductListProps = {
@@ -26,7 +27,7 @@ function ProductList({ items = [] }: ProductListProps) {
             <>
                 <ul className={styles["no-list-style"]}>
                     {items.map((item) => {
-                        const { id, title, stock, image, price } = item;
+                        const { id, title, stock, image, price, rating } = item;
 
                         return (
                             <li
@@ -46,6 +47,23 @@ function ProductList({ items = [] }: ProductListProps) {
                                             {title}
                                         </h1>
                                         <hr />
+                                        <div
+                                            className={styles.ratingContainer}
+                                            data-testid="ratingsContainer"
+                                        >
+                                            <Rating
+                                                readOnly
+                                                precision={0.5}
+                                                value={rating.rate}
+                                                className={styles.rating}
+                                                size="large"
+                                                data-testid="ratings"
+                                            />
+                                            <p className={styles.ratingCount}>
+                                                (<i>{rating.count}</i>)
+                                            </p>
+                                        </div>
+
                                         <div className={styles.info}>
                                             <div className={styles.infoLeft}>
                                                 <p className={styles.price}>
