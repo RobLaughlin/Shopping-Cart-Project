@@ -46,33 +46,56 @@ function ProductList({ items = [] }: ProductListProps) {
                                             {title}
                                         </h1>
                                         <hr />
-                                        <p className={styles.price}>
-                                            Price: <b>{`$${price}`}</b>
-                                        </p>
-                                        <p className={styles.itemsRemaining}>
-                                            {stock !== 0 ? (
-                                                <>
-                                                    Left in stock:{" "}
-                                                    <b>{item.stock}</b>
-                                                </>
-                                            ) : (
-                                                <b
+                                        <div className={styles.info}>
+                                            <div className={styles.infoLeft}>
+                                                <p className={styles.price}>
+                                                    Price: <b>{`$${price}`}</b>
+                                                </p>
+                                                <p
                                                     className={
-                                                        styles.outOfStock
+                                                        styles.itemsRemaining
                                                     }
                                                 >
-                                                    OUT OF STOCK
-                                                </b>
-                                            )}
-                                        </p>
-                                        <div className={styles.itemFooter}>
-                                            <Button
-                                                variant="contained"
-                                                className={styles.checkoutBtn}
-                                                size="large"
-                                            >
-                                                Add to Cart
-                                            </Button>
+                                                    {stock !== 0 ? (
+                                                        <>
+                                                            Left in stock:{" "}
+                                                            <b>{item.stock}</b>
+                                                        </>
+                                                    ) : (
+                                                        <b
+                                                            className={
+                                                                styles.outOfStock
+                                                            }
+                                                        >
+                                                            OUT OF STOCK
+                                                        </b>
+                                                    )}
+                                                </p>
+                                                <div
+                                                    className={
+                                                        styles.itemFooter
+                                                    }
+                                                >
+                                                    <Button
+                                                        variant="contained"
+                                                        className={
+                                                            styles.checkoutBtn
+                                                        }
+                                                        size="large"
+                                                    >
+                                                        Add to Cart
+                                                    </Button>
+                                                </div>
+                                            </div>
+                                            <div className={styles.infoRight}>
+                                                <p
+                                                    className={
+                                                        styles.description
+                                                    }
+                                                >
+                                                    {item.description}
+                                                </p>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>

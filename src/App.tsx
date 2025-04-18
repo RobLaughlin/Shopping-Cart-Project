@@ -1,6 +1,6 @@
 import "./App.css";
-// import ProductList from "./components/ProductList/ProductList.component";
-import Cart from "./components/Cart/Cart.component";
+import ProductList from "./components/ProductList/ProductList.component";
+// import Cart from "./components/Cart/Cart.component";
 function App() {
     const items = [
         {
@@ -67,8 +67,8 @@ function App() {
 
     return (
         <div id="App">
-            {/* <ProductList items={items} /> */}
-            <Cart items={items} />
+            <ProductList items={items} />
+            {/* <Cart items={items} /> */}
         </div>
     );
 }
