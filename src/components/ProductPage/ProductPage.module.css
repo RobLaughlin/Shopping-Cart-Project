@@ -30,6 +30,12 @@
     border-right: 1px solid rgba(0, 0, 0, 0.5);
 }
 
+.headerAndSidebar {
+    position: sticky;
+    top: 0;
+    left: 0;
+}
+
 .products {
     min-height: 100vh;
     background-color: white;

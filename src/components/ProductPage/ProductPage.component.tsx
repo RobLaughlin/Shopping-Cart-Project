@@ -55,32 +55,39 @@ function ProductPage({ items }: ProductPageProps) {
     return (
         <div className={styles.productPage}>
             <div className={styles.sidebarContainer}>
-                <h1 className={styles.sidebarHeader}>Categories</h1>
-                <ul className={styles.sidebar}>
-                    {[...categories.keys()].map((category) => {
-                        return (
-                            <li className={styles.sidebarItem} key={category}>
-                                <FormControlLabel
-                                    control={
-                                        <Checkbox
-                                            dataset-category={category}
-                                            checked={categories.get(category)}
-                                        />
-                                    }
-                                    label={uppercaseWords(category)}
-                                    onChange={(e: SyntheticEvent) => {
-                                        const target =
-                                            e.target as HTMLInputElement;
-                                        checkboxClicked(
-                                            category,
-                                            target.checked
-                                        );
-                                    }}
-                                />
-                            </li>
-                        );
-                    })}
-                </ul>
+                <div className={styles.headerAndSidebar}>
+                    <h1 className={styles.sidebarHeader}>Categories</h1>
+                    <ul className={styles.sidebar}>
+                        {[...categories.keys()].map((category) => {
+                            return (
+                                <li
+                                    className={styles.sidebarItem}
+                                    key={category}
+                                >
+                                    <FormControlLabel
+                                        control={
+                                            <Checkbox
+                                                dataset-category={category}
+                                                checked={categories.get(
+                                                    category
+                                                )}
+                                            />
+                                        }
+                                        label={uppercaseWords(category)}
+                                        onChange={(e: SyntheticEvent) => {
+                                            const target =
+                                                e.target as HTMLInputElement;
+                                            checkboxClicked(
+                                                category,
+                                                target.checked
+                                            );
+                                        }}
+                                    />
+                                </li>
+                            );
+                        })}
+                    </ul>
+                </div>
             </div>
 
             <ProductList
