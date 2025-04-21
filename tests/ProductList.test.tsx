@@ -5,11 +5,14 @@ import {
     ProductItem,
     ProductItemWithStock,
 } from "../src/Schemas/ProductItem.schema";
-import userEvent from "@testing-library/user-event";
 import { cloneDeep } from "lodash-es";
 import ProductList from "../src/components/ProductList/ProductList.component";
 import React from "react";
 import { TEST_PRODUCT_ITEMS } from "./Testdata";
+
+function escapeRegex(string: string) {
+    return string.replace(/[.*+?^${}()|[\]\\\/]/g, "\\$&");
+}
 
 describe("ProductList component", () => {
     const testItems = cloneDeep(TEST_PRODUCT_ITEMS);
@@ -19,7 +22,7 @@ describe("ProductList component", () => {
         itemElem: HTMLElement | null;
     };
 
-    function getItems() {
+    function getItems(): Item[] {
         render(<ProductList items={testItems} />);
         const items: Item[] = testItems.map((item: ProductItemWithStock) => {
             return {
@@ -65,6 +68,39 @@ describe("ProductList component", () => {
                 } else {
                     within(elem).getByText(/out of stock/i);
                 }
+            }).not.toThrowError();
+        });
+    });
+
+    it("Displays the description, image, and category of each item", () => {
+        const items = getItems();
+        items.forEach(({ item, itemElem }) => {
+            const elem = itemElem as HTMLElement;
+            expect(() => {
+                expect(elem).not.toBe(null);
+                within(elem).getByText(
+                    new RegExp(`${escapeRegex(item.description)}`, "i")
+                );
+                expect(
+                    within(elem)
+                        .getAllByRole("img")
+                        .some((img) => {
+                            return img.getAttribute("src") === item.image;
+                        })
+                );
+            }).not.toThrowError();
+        });
+    });
+
+    it("Displays the category of each item", () => {
+        const items = getItems();
+        items.forEach(({ item, itemElem }) => {
+            const elem = itemElem as HTMLElement;
+            expect(() => {
+                expect(elem).not.toBe(null);
+                within(elem).getAllByText(
+                    new RegExp(`${escapeRegex(item.category)}`, "i")
+                );
             }).not.toThrowError();
         });
     });

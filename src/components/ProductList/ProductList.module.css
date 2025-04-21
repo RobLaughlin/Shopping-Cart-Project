@@ -1,9 +1,9 @@
 .products {
-    padding: 32px;
     background-color: white;
     color: black;
-    margin: 32px auto 32px auto;
+    margin: auto;
     cursor: default;
+    padding: 32px;
 }
 
 .productItem {
@@ -11,6 +11,13 @@
     border-radius: 4px;
     width: 100%;
     margin-bottom: 16px;
+}
+
+.category {
+    margin-top: 8px;
+    font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS",
+        sans-serif;
+    font-size: 18px;
 }
 
 .no-list-style {

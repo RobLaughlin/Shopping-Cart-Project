@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { cloneDeep } from "lodash-es";
+import { cloneDeep, merge } from "lodash-es";
 import {
     ProductItemWithStock,
     PRODUCT_ITEM_WITH_STOCK_SCHEMA,
@@ -7,14 +7,17 @@ import {
 
 import Button from "@mui/material/Button";
 import Rating from "@mui/material/Rating";
-import styles from "./ProductList.module.css";
+import componentStyles from "./ProductList.module.css";
 
 type ProductListProps = {
-    items?: ProductItemWithStock[];
+    items: ProductItemWithStock[];
+    styleOverrides: object;
 };
 
-function ProductList({ items = [] }: ProductListProps) {
-    const [productItems, setProductItems] = useState(
+function ProductList({ items = [], styleOverrides = {} }: ProductListProps) {
+    const styles = { ...componentStyles, ...styleOverrides };
+
+    const [productItems, _] = useState(
         cloneDeep(
             items.filter(
                 (item) => PRODUCT_ITEM_WITH_STOCK_SCHEMA.safeParse(item).success
@@ -59,11 +62,14 @@ function ProductList({ items = [] }: ProductListProps) {
                                                 size="large"
                                                 data-testid="ratings"
                                             />
+
                                             <p className={styles.ratingCount}>
                                                 (<i>{rating.count}</i>)
                                             </p>
                                         </div>
-
+                                        <p className={styles.category}>
+                                            Category: <i>{item.category}</i>
+                                        </p>
                                         <div className={styles.info}>
                                             <div className={styles.infoLeft}>
                                                 <p className={styles.price}>
