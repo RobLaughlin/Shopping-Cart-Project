@@ -1,12 +1,14 @@
 .productPage {
     display: grid;
     grid-template-columns: 300px 1fr;
+    min-height: 100vh;
 }
 
 .sidebarContainer {
     background-color: rgb(250, 250, 250);
     color: black;
     border-right: 1px solid rgba(0, 0, 0, 0.5);
+    user-select: none;
 }
 
 .sidebarHeader {
@@ -26,4 +28,13 @@
     list-style: none;
     padding-left: 8px;
     border-right: 1px solid rgba(0, 0, 0, 0.5);
+}
+
+.products {
+    min-height: 100vh;
+    background-color: white;
+    color: black;
+    margin: auto;
+    cursor: default;
+    padding: 32px;
 }

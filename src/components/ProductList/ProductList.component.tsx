@@ -10,22 +10,15 @@ import Rating from "@mui/material/Rating";
 import componentStyles from "./ProductList.module.css";
 
 type ProductListProps = {
-    items: ProductItemWithStock[];
-    styleOverrides: object;
+    items?: ProductItemWithStock[];
+    styleOverrides?: object;
 };
 
 function ProductList({ items = [], styleOverrides = {} }: ProductListProps) {
     const styles = { ...componentStyles, ...styleOverrides };
 
-    const [productItems, _] = useState(
-        cloneDeep(
-            items.filter(
-                (item) => PRODUCT_ITEM_WITH_STOCK_SCHEMA.safeParse(item).success
-            )
-        )
-    );
-
     function renderItems(items: ProductItemWithStock[]) {
+        console.log(items);
         return (
             <>
                 <ul className={styles["no-list-style"]}>
@@ -143,8 +136,8 @@ function ProductList({ items = [], styleOverrides = {} }: ProductListProps) {
 
     return (
         <div className={styles.products}>
-            {productItems.length > 0 ? (
-                renderItems(productItems)
+            {items.length > 0 ? (
+                renderItems(items)
             ) : (
                 <p>No products found...</p>
             )}
