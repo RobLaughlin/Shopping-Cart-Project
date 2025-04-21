@@ -67,7 +67,8 @@ function ProductPage({ items }: ProductPageProps) {
                                     <FormControlLabel
                                         control={
                                             <Checkbox
-                                                dataset-category={category}
+                                                data-category={category}
+                                                data-testid={category}
                                                 checked={categories.get(
                                                     category
                                                 )}
