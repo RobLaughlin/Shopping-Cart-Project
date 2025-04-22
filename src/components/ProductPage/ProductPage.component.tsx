@@ -7,7 +7,7 @@ import TextField from "@mui/material/TextField";
 
 import { IconButton } from "@mui/material";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCartOutlined";
-import Badge, { badgeClasses } from "@mui/material/Badge";
+import Badge from "@mui/material/Badge";
 
 import styles from "./ProductPage.module.css";
 import { cloneDeep } from "lodash-es";
@@ -106,7 +106,10 @@ function ProductPage({ items }: ProductPageProps) {
             newCartItem.quantity = 0;
         }
 
-        newCartItem.quantity++;
+        newCartItem.quantity = Math.min(
+            newCartItem.stock,
+            newCartItem.quantity + 1
+        );
         cart.set(id, newCartItem);
         setCart(new Map(cart));
     }
