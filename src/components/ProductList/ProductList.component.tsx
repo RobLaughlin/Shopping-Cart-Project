@@ -6,10 +6,15 @@ import componentStyles from "./ProductList.module.css";
 
 type ProductListProps = {
     items?: ProductItemWithStock[];
+    addToCartHandler: (item: ProductItemWithStock) => void;
     styleOverrides?: object;
 };
 
-function ProductList({ items = [], styleOverrides = {} }: ProductListProps) {
+function ProductList({
+    items = [],
+    addToCartHandler,
+    styleOverrides = {},
+}: ProductListProps) {
     const styles = { ...componentStyles, ...styleOverrides };
 
     function renderItems(items: ProductItemWithStock[]) {
@@ -93,6 +98,11 @@ function ProductList({ items = [], styleOverrides = {} }: ProductListProps) {
                                                             styles.checkoutBtn
                                                         }
                                                         size="large"
+                                                        onClick={() => {
+                                                            addToCartHandler(
+                                                                item
+                                                            );
+                                                        }}
                                                     >
                                                         Add to Cart
                                                     </Button>

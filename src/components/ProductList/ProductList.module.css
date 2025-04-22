@@ -161,3 +161,9 @@
     margin-bottom: 0;
     padding-top: 16px;
 }
+
+.cartBadge {
+    position: absolute;
+    top: 20px !important;
+    left: -12px !important;
+}

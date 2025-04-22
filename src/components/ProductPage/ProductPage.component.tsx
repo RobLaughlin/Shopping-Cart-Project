@@ -4,7 +4,13 @@ import Checkbox from "@mui/material/Checkbox";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import { SyntheticEvent, useState } from "react";
 import TextField from "@mui/material/TextField";
+
+import { IconButton } from "@mui/material";
+import ShoppingCartIcon from "@mui/icons-material/ShoppingCartOutlined";
+import Badge, { badgeClasses } from "@mui/material/Badge";
+
 import styles from "./ProductPage.module.css";
+import { cloneDeep } from "lodash-es";
 
 type ProductPageProps = {
     items: ProductItemWithStock[];
@@ -22,7 +28,10 @@ function ProductPage({ items }: ProductPageProps) {
     );
 
     const [searchText, setSearchText] = useState("");
-    const [cart, setCart] = useState([]);
+
+    const [cart, setCart] = useState<Map<string, ProductItemWithStock>>(
+        new Map()
+    );
 
     function uppercaseWords(str: string): string {
         const words = str.split(" ");
@@ -86,6 +95,22 @@ function ProductPage({ items }: ProductPageProps) {
         setSearchText(e.target.value);
     }
 
+    function addToCartBtnClicked(item: ProductItemWithStock) {
+        const id = item.id as string;
+
+        let newCartItem = null;
+        if (cart.has(id)) {
+            newCartItem = cloneDeep(cart.get(id)) as ProductItemWithStock;
+        } else {
+            newCartItem = cloneDeep(item);
+            newCartItem.quantity = 0;
+        }
+
+        newCartItem.quantity++;
+        cart.set(id, newCartItem);
+        setCart(new Map(cart));
+    }
+
     return (
         <div className={styles.productPage}>
             <div className={styles.sidebarContainer}>
@@ -136,6 +161,20 @@ function ProductPage({ items }: ProductPageProps) {
                             value={searchText}
                             onChange={searchInputChanged}
                         />
+                        <IconButton className={styles.cartBtn}>
+                            <ShoppingCartIcon fontSize="large" />
+                            <Badge
+                                badgeContent={[...cart.values()].reduce(
+                                    (acc, item) => {
+                                        return acc + item.quantity;
+                                    },
+                                    0
+                                )}
+                                color="primary"
+                                overlap="circular"
+                                className={styles.cartBadge}
+                            />
+                        </IconButton>
                     </div>
                     <ProductList
                         items={Array.from(
@@ -145,6 +184,7 @@ function ProductPage({ items }: ProductPageProps) {
                             )
                         )}
                         styleOverrides={styles}
+                        addToCartHandler={addToCartBtnClicked}
                     />
                 </div>
             </main>

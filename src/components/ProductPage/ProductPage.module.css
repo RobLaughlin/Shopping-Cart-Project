@@ -66,6 +66,8 @@
     background-color: white;
     padding-left: 32px;
     padding-top: 16px;
+    display: flex;
+    width: 100%;
 }
 
 .searchBar {
@@ -74,4 +76,15 @@
 
 .productListContainer {
     min-width: calc(100vw - 300px);
+}
+
+.cartBadge {
+    top: -8px;
+    left: -6px;
+}
+
+.cartBtn {
+    margin-right: 32px !important;
+    margin-left: 16px !important;
+    outline: 0 !important;
 }
