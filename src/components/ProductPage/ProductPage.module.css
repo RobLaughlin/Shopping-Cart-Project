@@ -61,3 +61,17 @@
 .viewCartBtn:focus {
     outline: 0 !important;
 }
+
+.productListHeader {
+    background-color: white;
+    padding-left: 32px;
+    padding-top: 16px;
+}
+
+.searchBar {
+    color: white !important;
+}
+
+.productListContainer {
+    min-width: calc(100vw - 300px);
+}

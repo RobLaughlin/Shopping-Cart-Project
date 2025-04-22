@@ -2,10 +2,9 @@ import ProductList from "../ProductList/ProductList.component";
 import { ProductItemWithStock } from "../../Schemas/ProductItem.schema";
 import Checkbox from "@mui/material/Checkbox";
 import FormControlLabel from "@mui/material/FormControlLabel";
-import { Button } from "@mui/material";
-
-import styles from "./ProductPage.module.css";
 import { SyntheticEvent, useState } from "react";
+import TextField from "@mui/material/TextField";
+import styles from "./ProductPage.module.css";
 
 type ProductPageProps = {
     items: ProductItemWithStock[];
@@ -22,7 +21,10 @@ function ProductPage({ items }: ProductPageProps) {
         })()
     );
 
-    function uppercaseWords(str: string) {
+    const [searchText, setSearchText] = useState("");
+    const [cart, setCart] = useState([]);
+
+    function uppercaseWords(str: string): string {
         const words = str.split(" ");
         for (let i = 0; i < words.length; i++) {
             const word = words[i];
@@ -33,12 +35,15 @@ function ProductPage({ items }: ProductPageProps) {
         return words.join(" ");
     }
 
-    function checkboxClicked(category: string, checked: boolean) {
+    function checkboxClicked(category: string, checked: boolean): void {
         categories.set(category, checked);
         setCategories(new Map(categories));
     }
 
-    function filterProductsByCategory(categories: Map<string, boolean>) {
+    function filterProductsByCategory(
+        items: ProductItemWithStock[],
+        categories: Map<string, boolean>
+    ): ProductItemWithStock[] {
         // If all checkboxes are unchecked, just list all products
         if (!Array.from(categories.values()).some((checked) => checked)) {
             return items;
@@ -51,6 +56,34 @@ function ProductPage({ items }: ProductPageProps) {
             );
         });
         return filtered;
+    }
+
+    function filterProductsBySearch(
+        items: ProductItemWithStock[],
+        searchText: string
+    ): ProductItemWithStock[] {
+        // Return all items if the search bar is empty
+        if (searchText === "") {
+            return items;
+        }
+
+        return items.filter((item) => {
+            const searchableFields = [
+                item.title.toLowerCase(),
+                item.description.toLowerCase(),
+                item.category.toLowerCase(),
+            ];
+
+            // Search word by word for a more robust search
+            return searchableFields.some((field) => {
+                const words = searchText.split(" ");
+                return words.some((word) => field.includes(word.toLowerCase()));
+            });
+        });
+    }
+
+    function searchInputChanged(e: any): void {
+        setSearchText(e.target.value);
     }
 
     return (
@@ -90,21 +123,31 @@ function ProductPage({ items }: ProductPageProps) {
                         })}
                     </ul>
                 </div>
-                <div className={styles.viewCartBtnContainer}>
-                    <Button
-                        variant="contained"
-                        className={styles.viewCartBtn}
-                        size="large"
-                    >
-                        View Cart
-                    </Button>
-                </div>
             </div>
-
-            <ProductList
-                items={Array.from(filterProductsByCategory(categories))}
-                styleOverrides={styles}
-            />
+            <main>
+                <div className={styles.productListContainer}>
+                    <div className={styles.productListHeader}>
+                        <TextField
+                            id="standard-basic"
+                            label="Search products"
+                            variant="standard"
+                            color="primary"
+                            fullWidth={true}
+                            value={searchText}
+                            onChange={searchInputChanged}
+                        />
+                    </div>
+                    <ProductList
+                        items={Array.from(
+                            filterProductsBySearch(
+                                filterProductsByCategory(items, categories),
+                                searchText
+                            )
+                        )}
+                        styleOverrides={styles}
+                    />
+                </div>
+            </main>
         </div>
     );
 }

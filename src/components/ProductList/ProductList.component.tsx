@@ -1,9 +1,4 @@
-import { useState } from "react";
-import { cloneDeep, merge } from "lodash-es";
-import {
-    ProductItemWithStock,
-    PRODUCT_ITEM_WITH_STOCK_SCHEMA,
-} from "../../Schemas/ProductItem.schema";
+import { ProductItemWithStock } from "../../Schemas/ProductItem.schema";
 
 import Button from "@mui/material/Button";
 import Rating from "@mui/material/Rating";
@@ -18,7 +13,6 @@ function ProductList({ items = [], styleOverrides = {} }: ProductListProps) {
     const styles = { ...componentStyles, ...styleOverrides };
 
     function renderItems(items: ProductItemWithStock[]) {
-        console.log(items);
         return (
             <>
                 <ul className={styles["no-list-style"]}>
