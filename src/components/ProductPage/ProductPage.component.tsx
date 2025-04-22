@@ -2,6 +2,7 @@ import ProductList from "../ProductList/ProductList.component";
 import { ProductItemWithStock } from "../../Schemas/ProductItem.schema";
 import Checkbox from "@mui/material/Checkbox";
 import FormControlLabel from "@mui/material/FormControlLabel";
+import { Button } from "@mui/material";
 
 import styles from "./ProductPage.module.css";
 import { SyntheticEvent, useState } from "react";
@@ -88,6 +89,15 @@ function ProductPage({ items }: ProductPageProps) {
                             );
                         })}
                     </ul>
+                </div>
+                <div className={styles.viewCartBtnContainer}>
+                    <Button
+                        variant="contained"
+                        className={styles.viewCartBtn}
+                        size="large"
+                    >
+                        View Cart
+                    </Button>
                 </div>
             </div>
 

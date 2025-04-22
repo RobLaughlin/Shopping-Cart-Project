@@ -9,6 +9,11 @@
     color: black;
     border-right: 1px solid rgba(0, 0, 0, 0.5);
     user-select: none;
+    display: grid;
+    max-height: 100vh;
+    position: sticky;
+    top: 0;
+    left: 0;
 }
 
 .sidebarHeader {
@@ -17,6 +22,7 @@
     font-weight: 200;
     padding: 16px;
     border-bottom: 1px solid rgba(0, 0, 0, 0.5);
+    border-right: 1px solid rgba(0, 0, 0, 0.5);
     background-color: rgb(230, 230, 230);
 }
 
@@ -30,12 +36,6 @@
     border-right: 1px solid rgba(0, 0, 0, 0.5);
 }
 
-.headerAndSidebar {
-    position: sticky;
-    top: 0;
-    left: 0;
-}
-
 .products {
     min-height: 100vh;
     background-color: white;
@@ -43,4 +43,21 @@
     margin: auto;
     cursor: default;
     padding: 32px;
+}
+
+.viewCartBtnContainer {
+    margin-top: auto !important;
+    display: flex !important;
+    width: 100%;
+    align-items: center;
+    vertical-align: middle;
+}
+
+.viewCartBtn {
+    margin: auto auto 32px auto !important;
+    width: 80%;
+}
+
+.viewCartBtn:focus {
+    outline: 0 !important;
 }
