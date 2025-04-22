@@ -103,6 +103,11 @@ function ProductList({
                                                                 item
                                                             );
                                                         }}
+                                                        disabled={
+                                                            stock === 0
+                                                                ? true
+                                                                : false
+                                                        }
                                                     >
                                                         Add to Cart
                                                     </Button>
