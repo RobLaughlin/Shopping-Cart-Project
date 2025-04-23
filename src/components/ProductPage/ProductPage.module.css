@@ -75,7 +75,7 @@
 }
 
 .productListContainer {
-    min-width: calc(100vw - 300px);
+    width: 100%;
 }
 
 .cartBadge {
