@@ -10,13 +10,22 @@ import ShoppingCartIcon from "@mui/icons-material/ShoppingCartOutlined";
 import Badge from "@mui/material/Badge";
 
 import styles from "./ProductPage.module.css";
-import { cloneDeep } from "lodash-es";
 
 type ProductPageProps = {
     items: ProductItemWithStock[];
+    itemsInCart?: number;
+    onAddToCartBtnClicked?: (item: ProductItemWithStock) => void;
+    onCartBtnClicked?: () => void;
 };
 
-function ProductPage({ items }: ProductPageProps) {
+function ProductPage({
+    items,
+    itemsInCart = 0,
+    onAddToCartBtnClicked = (item) => {
+        item;
+    },
+    onCartBtnClicked = () => {},
+}: ProductPageProps) {
     const [categories, setCategories] = useState(
         (() => {
             const categoryMap = new Map<string, boolean>();
@@ -28,10 +37,6 @@ function ProductPage({ items }: ProductPageProps) {
     );
 
     const [searchText, setSearchText] = useState("");
-
-    const [cart, setCart] = useState<Map<string, ProductItemWithStock>>(
-        new Map()
-    );
 
     function uppercaseWords(str: string): string {
         const words = str.split(" ");
@@ -95,25 +100,6 @@ function ProductPage({ items }: ProductPageProps) {
         setSearchText(e.target.value);
     }
 
-    function addToCartBtnClicked(item: ProductItemWithStock) {
-        const id = item.id as string;
-
-        let newCartItem = null;
-        if (cart.has(id)) {
-            newCartItem = cloneDeep(cart.get(id)) as ProductItemWithStock;
-        } else {
-            newCartItem = cloneDeep(item);
-            newCartItem.quantity = 0;
-        }
-
-        newCartItem.quantity = Math.min(
-            newCartItem.stock,
-            newCartItem.quantity + 1
-        );
-        cart.set(id, newCartItem);
-        setCart(new Map(cart));
-    }
-
     return (
         <div className={styles.productPage}>
             <div className={styles.sidebarContainer}>
@@ -164,15 +150,13 @@ function ProductPage({ items }: ProductPageProps) {
                             value={searchText}
                             onChange={searchInputChanged}
                         />
-                        <IconButton className={styles.cartBtn}>
+                        <IconButton
+                            className={styles.cartBtn}
+                            onClick={onCartBtnClicked}
+                        >
                             <ShoppingCartIcon fontSize="large" />
                             <Badge
-                                badgeContent={[...cart.values()].reduce(
-                                    (acc, item) => {
-                                        return acc + item.quantity;
-                                    },
-                                    0
-                                )}
+                                badgeContent={itemsInCart}
                                 color="primary"
                                 overlap="circular"
                                 className={styles.cartBadge}
@@ -187,7 +171,7 @@ function ProductPage({ items }: ProductPageProps) {
                             )
                         )}
                         styleOverrides={styles}
-                        addToCartHandler={addToCartBtnClicked}
+                        addToCartHandler={onAddToCartBtnClicked}
                     />
                 </div>
             </main>

@@ -1,10 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { within } from "@testing-library/react";
 import { render, screen } from "@testing-library/react";
-import {
-    ProductItem,
-    ProductItemWithStock,
-} from "../src/Schemas/ProductItem.schema";
 import ProductPage from "../src/components/ProductPage/ProductPage.component";
 import { TEST_PRODUCT_ITEMS } from "./Testdata";
 import userEvent from "@testing-library/user-event";

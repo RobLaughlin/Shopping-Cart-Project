@@ -129,7 +129,6 @@ function ProductList({
                         );
                     })}
                 </ul>
-                <hr />
                 <div className={styles.viewCartContainer}>
                     <Button
                         variant="contained"

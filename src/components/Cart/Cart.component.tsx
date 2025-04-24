@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { cloneDeep } from "lodash-es";
 import {
     ProductItemWithStock,
@@ -16,9 +16,15 @@ import styles from "./Cart.module.css";
 
 type CartProps = {
     items?: ProductItemWithStock[];
+    onCartChanged?: (cartItems: ProductItemWithStock[]) => void;
 };
 
-function Cart({ items = [] }: CartProps) {
+function Cart({
+    items = [],
+    onCartChanged = (cartItems: ProductItemWithStock[]) => {
+        cartItems;
+    },
+}: CartProps) {
     const [productItems, setProductItems] = useState(
         cloneDeep(
             items.filter(
@@ -26,6 +32,10 @@ function Cart({ items = [] }: CartProps) {
             )
         )
     );
+
+    useEffect(() => {
+        onCartChanged(productItems);
+    }, [productItems]);
 
     function updateQuantity(key: number | string, quantity: number): void {
         const item = productItems.find((item) => item.id === key);
