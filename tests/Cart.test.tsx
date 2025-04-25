@@ -8,6 +8,7 @@ import Cart from "../src/components/Cart/Cart.component";
 import React from "react";
 import { date } from "zod";
 import { TEST_PRODUCT_ITEMS } from "./Testdata";
+import { BrowserRouter } from "react-router-dom";
 
 describe("Cart component", () => {
     const testItems = cloneDeep(TEST_PRODUCT_ITEMS);
@@ -37,11 +38,15 @@ describe("Cart component", () => {
         rerender = true
     ): CartQueries {
         if (rerender) {
-            render(<Cart items={items} />);
+            render(
+                <BrowserRouter>
+                    <Cart items={items} />
+                </BrowserRouter>
+            );
         }
 
         const queryEmptyText = (): HTMLElement | null => {
-            return screen.queryByText(/cart is empty/i);
+            return screen.queryByText(/empty/i);
         };
 
         const queryFormattedTotalCost = (

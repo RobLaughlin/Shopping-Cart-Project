@@ -17,7 +17,7 @@ function MainNav() {
 
     return (
         <div className={styles.mainNav}>
-            <nav>
+            <nav className={styles.navBar}>
                 <ol className={styles.navItems}>
                     {navItems.map(({ text, link, id }) => {
                         return (

@@ -4,6 +4,7 @@ import {
     ProductItemWithStock,
     PRODUCT_ITEM_WITH_STOCK_SCHEMA,
 } from "../../Schemas/ProductItem.schema";
+import { Link } from "react-router-dom";
 
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
@@ -231,11 +232,22 @@ function Cart({
     }
 
     return (
-        <div className={styles.cart}>
+        <div
+            className={styles.cart}
+            style={{ display: productItems.length === 0 ? "flex" : "block" }}
+        >
             {productItems.length > 0 ? (
                 renderItems(productItems)
             ) : (
-                <p>Shopping cart is empty</p>
+                <div className={styles.emptyCartContainer}>
+                    <h1 className={styles.emptyCartText}>
+                        Your shopping cart is currently empty!
+                    </h1>
+                    <p className={styles.emptyCartDescription}>
+                        Click <Link to="/">here</Link> to visit the products
+                        page.
+                    </p>
+                </div>
             )}
         </div>
     );

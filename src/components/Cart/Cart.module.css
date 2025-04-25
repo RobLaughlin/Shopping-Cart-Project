@@ -2,8 +2,26 @@
     padding: 32px;
     background-color: white;
     color: black;
-    margin: 32px auto 32px auto;
     cursor: default;
+    height: 100%;
+}
+
+.emptyCartContainer {
+    margin: auto;
+    text-align: center;
+}
+
+.emptyCartText {
+    font-family: "Times New Roman", Times, serif;
+    font-weight: 200;
+    font-size: 48px;
+}
+
+.emptyCartDescription {
+    margin-top: 16px;
+    font-family: "Times New Roman", Times, serif;
+    font-weight: 200;
+    font-size: 24px;
 }
 
 .cartItem {
