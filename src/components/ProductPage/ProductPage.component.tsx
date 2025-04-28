@@ -2,7 +2,7 @@ import ProductList from "../ProductList/ProductList.component";
 import { ProductItemWithStock } from "../../Schemas/ProductItem.schema";
 import Checkbox from "@mui/material/Checkbox";
 import FormControlLabel from "@mui/material/FormControlLabel";
-import { SyntheticEvent, useState } from "react";
+import { SyntheticEvent, useEffect, useState } from "react";
 import TextField from "@mui/material/TextField";
 
 import { IconButton } from "@mui/material";
@@ -10,6 +10,7 @@ import ShoppingCartIcon from "@mui/icons-material/ShoppingCartOutlined";
 import Badge from "@mui/material/Badge";
 
 import styles from "./ProductPage.module.css";
+import { cloneDeep } from "lodash-es";
 
 type ProductPageProps = {
     items: ProductItemWithStock[];
@@ -26,17 +27,16 @@ function ProductPage({
     },
     onCartBtnClicked = () => {},
 }: ProductPageProps) {
-    const [categories, setCategories] = useState(
-        (() => {
-            const categoryMap = new Map<string, boolean>();
-            items.forEach((item) => {
-                categoryMap.set(item.category, false);
-            });
-            return categoryMap;
-        })()
-    );
-
+    const [categories, setCategories] = useState(new Map<string, boolean>());
     const [searchText, setSearchText] = useState("");
+
+    useEffect(() => {
+        const categoryMap = new Map<string, boolean>();
+        items.forEach((item) => {
+            categoryMap.set(item.category, false);
+        });
+        setCategories(categoryMap);
+    }, [items]);
 
     function uppercaseWords(str: string): string {
         const words = str.split(" ");
@@ -100,6 +100,7 @@ function ProductPage({
         setSearchText(e.target.value);
     }
 
+    console.log(categories);
     return (
         <div className={styles.productPage}>
             <div className={styles.sidebarContainer}>
