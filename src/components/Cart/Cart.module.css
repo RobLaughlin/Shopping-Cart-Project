@@ -166,4 +166,12 @@
         margin: auto;
         font-size: min(36px, 5vw);
     }
+
+    .ratingCount {
+        font-size: 16px;
+    }
+
+    .totalPrice {
+        text-align: left;
+    }
 }

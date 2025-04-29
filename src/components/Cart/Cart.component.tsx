@@ -12,6 +12,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import IconButton from "@mui/material/IconButton";
 import Button from "@mui/material/Button";
 import Rating from "@mui/material/Rating";
+import { useMediaQuery } from "react-responsive";
 
 import styles from "./Cart.module.css";
 
@@ -33,6 +34,8 @@ function Cart({
             )
         )
     );
+
+    const isSmallScreen = useMediaQuery({ maxWidth: 800 });
 
     useEffect(() => {
         window.scrollTo(0, 0);
@@ -112,7 +115,11 @@ function Cart({
                                                 precision={0.5}
                                                 value={rating.rate}
                                                 className={styles.rating}
-                                                size="large"
+                                                size={
+                                                    isSmallScreen
+                                                        ? "small"
+                                                        : "large"
+                                                }
                                                 data-testid="ratings"
                                             />
                                             <p className={styles.ratingCount}>
