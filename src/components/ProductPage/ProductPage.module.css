@@ -88,3 +88,17 @@
     margin-left: 16px !important;
     outline: 0 !important;
 }
+
+@media screen and (max-width: 800px) {
+    .info {
+        grid-template-columns: 1fr;
+    }
+
+    .sidebarContainer {
+        display: none;
+    }
+
+    .productListContainer {
+        width: 100vw;
+    }
+}

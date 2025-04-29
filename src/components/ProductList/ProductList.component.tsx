@@ -1,4 +1,5 @@
 import { ProductItemWithStock } from "../../Schemas/ProductItem.schema";
+import { useMediaQuery } from "react-responsive";
 
 import Button from "@mui/material/Button";
 import Rating from "@mui/material/Rating";
@@ -17,6 +18,8 @@ function ProductList({
     styleOverrides = {},
 }: ProductListProps) {
     const styles = { ...componentStyles, ...styleOverrides };
+
+    const isSmallScreen = useMediaQuery({ maxWidth: 800 });
 
     function renderItems(items: ProductItemWithStock[]) {
         return (
@@ -52,7 +55,11 @@ function ProductList({
                                                 precision={0.5}
                                                 value={rating.rate}
                                                 className={styles.rating}
-                                                size="large"
+                                                size={
+                                                    isSmallScreen
+                                                        ? "small"
+                                                        : "large"
+                                                }
                                                 data-testid="ratings"
                                             />
 

@@ -220,7 +220,7 @@ function Cart({
                     })}
                 </ul>
                 <div className={styles.totalCostContainer}>
-                    <p>
+                    <p className={styles.totalCostText}>
                         Total Cost: <b>{calculateTotalCost(items)}</b>
                     </p>
                     <Button

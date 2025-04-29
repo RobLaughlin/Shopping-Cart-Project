@@ -151,3 +151,19 @@
 .removeItem {
     margin-left: auto;
 }
+
+@media screen and (max-width: 800px) {
+    .totalCostContainer {
+        flex-direction: column;
+    }
+
+    .checkoutBtn {
+        width: 80%;
+        margin: 16px auto auto auto !important;
+    }
+
+    .totalCostText {
+        margin: auto;
+        font-size: min(36px, 5vw);
+    }
+}

@@ -161,3 +161,18 @@
     margin-bottom: 0;
     padding-top: 16px;
 }
+
+@media screen and (max-width: 1600px) {
+    .info {
+        grid-template-columns: 1fr;
+    }
+
+    .infoRight {
+        padding-left: 0;
+        font-size: min(3.5vw, 16px);
+    }
+
+    .ratingCount {
+        font-size: 12px;
+    }
+}
