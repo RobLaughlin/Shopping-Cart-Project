@@ -9,6 +9,7 @@ import { cloneDeep } from "lodash-es";
 import ProductList from "../src/components/ProductList/ProductList.component";
 import React from "react";
 import { TEST_PRODUCT_ITEMS } from "./Testdata";
+import { BrowserRouter } from "react-router-dom";
 
 function escapeRegex(string: string) {
     return string.replace(/[.*+?^${}()|[\]\\\/]/g, "\\$&");
@@ -23,7 +24,11 @@ describe("ProductList component", () => {
     };
 
     function getItems(): Item[] {
-        render(<ProductList items={testItems} />);
+        render(
+            <BrowserRouter>
+                <ProductList items={testItems} addToCartHandler={() => {}} />
+            </BrowserRouter>
+        );
         const items: Item[] = testItems.map((item: ProductItemWithStock) => {
             return {
                 item: item,

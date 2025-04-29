@@ -6,11 +6,16 @@ import { TEST_PRODUCT_ITEMS } from "./Testdata";
 import userEvent from "@testing-library/user-event";
 import React from "react";
 import { cloneDeep } from "lodash-es";
+import { BrowserRouter } from "react-router-dom";
 
 describe("Product Page Sidebar Tests", () => {
     it("Filters products based on category. Displays all products when no categories are selected", () => {
         const user = userEvent.setup();
-        render(<ProductPage items={TEST_PRODUCT_ITEMS} />);
+        render(
+            <BrowserRouter>
+                <ProductPage items={TEST_PRODUCT_ITEMS} />
+            </BrowserRouter>
+        );
 
         expect(async () => {
             const categories = TEST_PRODUCT_ITEMS.map((item) => item.category);
