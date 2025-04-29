@@ -100,7 +100,6 @@ function ProductPage({
         setSearchText(e.target.value);
     }
 
-    console.log(categories);
     return (
         <div className={styles.productPage}>
             <div className={styles.sidebarContainer}>

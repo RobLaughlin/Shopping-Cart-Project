@@ -7,8 +7,10 @@ import {
     PRODUCT_ITEM_WITH_STOCK_SCHEMA,
 } from "./Schemas/ProductItem.schema";
 import MainNav from "./components/MainNav/MainNav.component";
-import "./App.css";
 import { cloneDeep } from "lodash-es";
+import CircularProgress from "@mui/material/CircularProgress";
+
+import "./App.css";
 
 const PRODUCT_API_URL = "https://fakestoreapi.com/products";
 
@@ -26,9 +28,7 @@ function App() {
     useEffect(() => {
         setLoading(true);
         const fetchProducts = async () => {
-            const products = await fetch(PRODUCT_API_URL, {
-                cache: "force-cache",
-            });
+            const products = await fetch(PRODUCT_API_URL);
             const data = await products.json();
 
             return data
@@ -48,12 +48,9 @@ function App() {
 
         fetchProducts()
             .catch(() => {
-                console.log("err");
                 setLoading(false);
             })
             .then((products: ProductItemWithStock[]) => {
-                console.log(products);
-
                 setProductItems(cloneDeep(products));
                 setLoading(false);
             });
@@ -100,18 +97,34 @@ function App() {
                     <Route
                         index
                         element={
-                            <ProductPage
-                                items={productItems}
-                                itemsInCart={[...cartItems.values()].reduce(
-                                    (acc, item) => {
-                                        acc += item.quantity;
-                                        return acc;
-                                    },
-                                    0
-                                )}
-                                onCartBtnClicked={cartBtnClicked}
-                                onAddToCartBtnClicked={addToCartBtnClicked}
-                            />
+                            !loading ? (
+                                <ProductPage
+                                    items={productItems}
+                                    itemsInCart={[...cartItems.values()].reduce(
+                                        (acc, item) => {
+                                            acc += item.quantity;
+                                            return acc;
+                                        },
+                                        0
+                                    )}
+                                    onCartBtnClicked={cartBtnClicked}
+                                    onAddToCartBtnClicked={addToCartBtnClicked}
+                                />
+                            ) : (
+                                <div className="loadingContainer">
+                                    <div className="loadingTextAndIcon">
+                                        <div className="loadingIconContainer">
+                                            <CircularProgress
+                                                className="loadingIcon"
+                                                size="256px"
+                                            />
+                                        </div>
+                                        <h1 className="loadingText">
+                                            Loading product items...
+                                        </h1>
+                                    </div>
+                                </div>
+                            )
                         }
                     />
                     <Route
