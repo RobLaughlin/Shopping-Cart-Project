@@ -10,7 +10,6 @@ import ShoppingCartIcon from "@mui/icons-material/ShoppingCartOutlined";
 import Badge from "@mui/material/Badge";
 
 import styles from "./ProductPage.module.css";
-import { cloneDeep } from "lodash-es";
 
 type ProductPageProps = {
     items: ProductItemWithStock[];
