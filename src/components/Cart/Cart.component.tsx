@@ -35,6 +35,10 @@ function Cart({
     );
 
     useEffect(() => {
+        window.scrollTo(0, 0);
+    }, []);
+
+    useEffect(() => {
         onCartChanged(productItems);
     }, [productItems]);
 

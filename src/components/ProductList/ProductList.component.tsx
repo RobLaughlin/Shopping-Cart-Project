@@ -3,6 +3,7 @@ import { ProductItemWithStock } from "../../Schemas/ProductItem.schema";
 import Button from "@mui/material/Button";
 import Rating from "@mui/material/Rating";
 import componentStyles from "./ProductList.module.css";
+import { Link } from "react-router-dom";
 
 type ProductListProps = {
     items?: ProductItemWithStock[];
@@ -130,13 +131,15 @@ function ProductList({
                     })}
                 </ul>
                 <div className={styles.viewCartContainer}>
-                    <Button
-                        variant="contained"
-                        className={styles.viewCartBtn}
-                        size="large"
-                    >
-                        View Cart
-                    </Button>
+                    <Link to="/cart" className={styles.viewCartBtnContainer}>
+                        <Button
+                            variant="contained"
+                            className={styles.viewCartBtn}
+                            size="large"
+                        >
+                            View Cart
+                        </Button>
+                    </Link>
                 </div>
             </>
         );
